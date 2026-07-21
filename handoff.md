@@ -4,19 +4,18 @@
 
 ## 目前做到哪
 
-本地收工完成；等待 connector：obsidian, notion。
+尚待 connector：obsidian。
 
 ## 狀態
 
 - Phase：AWAITING_EXTERNAL
-- Revision：36
-- Last action：finish
+- Revision：37
+- Last action：complete-notion
 - Git：VERIFIED；branch=main；last_push=ee1e24f
 
 ## 下一步
 
-1. 完成 obsidian connector，再執行 Source complete。
-2. 完成 notion connector，再執行 Source complete。
+1. 完成 obsidian connector。
 
 ## Connectors
 
@@ -24,11 +23,11 @@
 - skills：VERIFIED
 - gdrive：DETECTED
 - obsidian：PENDING_AGENT
-- notion：PENDING_AGENT
+- notion：VERIFIED
 - cdn：NOT_CONFIGURED
 - hub：HUB_READY
 
 ## 最後更新
 
-- 2026-07-21T16:32:01Z
+- 2026-07-21T16:34:44Z
 - Codex @ windows
