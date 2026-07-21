@@ -2,18 +2,18 @@
   "schema_version": 3,
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
-  "phase": "AWAITING_EXTERNAL",
-  "revision": 37,
+  "phase": "READY",
+  "revision": 38,
   "session_id": null,
-  "summary": "尚待 connector：obsidian。",
-  "last_action": "complete-notion",
-  "updated_at": "2026-07-21T16:34:44Z",
+  "summary": "全部收工 connector 已完成。",
+  "last_action": "complete-obsidian",
+  "updated_at": "2026-07-21T16:34:54Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "完成 obsidian connector。"
+    "下一台電腦執行 Source 即可自動開工。"
   ],
   "git": {
     "enabled": true,
@@ -41,9 +41,9 @@
       "note": null
     },
     "obsidian": {
-      "status": "PENDING_AGENT",
+      "status": "BLOCKED",
       "external_id": "cross-device-agent-skills-master/專案工作流程.md",
-      "note": null
+      "note": "config 指定的 vault-relative note 在目前同步目錄不存在；未猜測路徑或建立替代檔。請確認 Obsidian vault 同步後重試。"
     },
     "notion": {
       "status": "VERIFIED",

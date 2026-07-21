@@ -4,30 +4,30 @@
 
 ## 目前做到哪
 
-尚待 connector：obsidian。
+全部收工 connector 已完成。
 
 ## 狀態
 
-- Phase：AWAITING_EXTERNAL
-- Revision：37
-- Last action：complete-notion
+- Phase：READY
+- Revision：38
+- Last action：complete-obsidian
 - Git：VERIFIED；branch=main；last_push=ee1e24f
 
 ## 下一步
 
-1. 完成 obsidian connector。
+1. 下一台電腦執行 Source 即可自動開工。
 
 ## Connectors
 
 - github：READY
 - skills：VERIFIED
 - gdrive：DETECTED
-- obsidian：PENDING_AGENT
+- obsidian：BLOCKED
 - notion：VERIFIED
 - cdn：NOT_CONFIGURED
 - hub：HUB_READY
 
 ## 最後更新
 
-- 2026-07-21T16:34:44Z
+- 2026-07-21T16:34:54Z
 - Codex @ windows
