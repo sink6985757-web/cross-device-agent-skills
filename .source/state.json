@@ -3,11 +3,11 @@
     "project_id":  "64851505-857c-4dd4-a9f1-064d82331b43",
     "project_name":  "Source project pipeline",
     "phase":  "AWAITING_EXTERNAL",
-    "revision":  7,
+    "revision":  8,
     "session_id":  null,
     "summary":  "本地收工完成；等待 connector：notion。",
-    "last_action":  "finish-preflight",
-    "updated_at":  "2026-07-21T14:38:15Z",
+    "last_action":  "finish",
+    "updated_at":  "2026-07-21T14:38:20Z",
     "actor":  {
                   "agent":  "Agent",
                   "device":  "YULIN-SFG16-72"
@@ -17,12 +17,12 @@
                    ],
     "git":  {
                 "enabled":  true,
-                "status":  "DIRTY",
+                "status":  "VERIFIED",
                 "branch":  "main",
                 "remote":  "https://github.com/sink6985757-web/cross-device-agent-skills.git",
                 "ahead":  0,
                 "behind":  0,
-                "last_push":  "4e8a6a3"
+                "last_push":  "36de1ac"
             },
     "connectors":  {
                        "github":  {
