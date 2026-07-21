@@ -3,18 +3,17 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "AWAITING_EXTERNAL",
-  "revision": 16,
+  "revision": 17,
   "session_id": null,
-  "summary": "本地收工完成；等待 connector：obsidian, notion。",
-  "last_action": "finish",
-  "updated_at": "2026-07-21T15:14:53Z",
+  "summary": "尚待 connector：notion。",
+  "last_action": "complete-obsidian",
+  "updated_at": "2026-07-21T15:16:16Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "完成 obsidian connector，再執行 Source complete。",
-    "完成 notion connector，再執行 Source complete。"
+    "完成 notion connector。"
   ],
   "git": {
     "enabled": true,
@@ -42,9 +41,9 @@
       "note": null
     },
     "obsidian": {
-      "status": "PENDING_AGENT",
-      "external_id": "",
-      "note": "專案工作流程已更新並回讀"
+      "status": "VERIFIED",
+      "external_id": null,
+      "note": "跨系統架構、authority 邊界、三 OS CI 與最終 commits 已更新並回讀"
     },
     "notion": {
       "status": "PENDING_AGENT",
