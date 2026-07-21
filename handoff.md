@@ -9,13 +9,13 @@
 ## 狀態
 
 - Phase：AWAITING_EXTERNAL
-- Revision：8
-- Last action：finish
-- Git：VERIFIED；branch=main；last_push=36de1ac
+- Revision：9
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=36de1ac
 
 ## 下一步
 
-1. 下次執行 `./source.ps1` 自動開工。
+1. 完成 notion connector。
 
 ## Connectors
 
@@ -28,5 +28,5 @@
 
 ## 最後更新
 
-- 2026-07-21T14:38:20Z
+- 2026-07-21T14:39:55Z
 - Agent @ YULIN-SFG16-72

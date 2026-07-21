@@ -549,7 +549,13 @@ function Finish-Project {
     $state.phase = if ($pending.Count) { 'AWAITING_EXTERNAL' } else { 'READY' }
     $state.session_id = $null
     $state.summary = if ($pending.Count) { "本地收工完成；等待 connector：$($pending -join ', ')。" } else { '收工完成，可安全換電腦或 Agent。' }
-    if (-not $steps.Count) { $steps = @('下次執行 `./source.ps1` 自動開工。') }
+    if (-not $steps.Count) {
+        $steps = if ($pending.Count) {
+            @($pending | ForEach-Object { "完成 $_ connector。" })
+        } else {
+            @('下次執行 `./source.ps1` 自動開工。')
+        }
+    }
     Update-GitState -Root $Root -State $state
     Save-Checkpoint -Root $Root -Config $config -State $state -LastAction 'finish-preflight' -NextSteps $steps
     if (-not $SkipGit) {

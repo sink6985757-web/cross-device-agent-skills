@@ -3,21 +3,21 @@
     "project_id":  "64851505-857c-4dd4-a9f1-064d82331b43",
     "project_name":  "Source project pipeline",
     "phase":  "AWAITING_EXTERNAL",
-    "revision":  8,
+    "revision":  9,
     "session_id":  null,
     "summary":  "本地收工完成；等待 connector：notion。",
-    "last_action":  "finish",
-    "updated_at":  "2026-07-21T14:38:20Z",
+    "last_action":  "finish-preflight",
+    "updated_at":  "2026-07-21T14:39:55Z",
     "actor":  {
                   "agent":  "Agent",
                   "device":  "YULIN-SFG16-72"
               },
     "next_steps":  [
-                       "下次執行 `./source.ps1` 自動開工。"
+                       "完成 notion connector。"
                    ],
     "git":  {
                 "enabled":  true,
-                "status":  "VERIFIED",
+                "status":  "DIRTY",
                 "branch":  "main",
                 "remote":  "https://github.com/sink6985757-web/cross-device-agent-skills.git",
                 "ahead":  0,
@@ -33,7 +33,7 @@
                        "skills":  {
                                       "status":  "VERIFIED",
                                       "external_id":  null,
-                                      "note":  "✓ Set skills.external_dirs = ~/.agents/skills in C:\\Users\\Yulin\\AppData\\Local\\hermes\\config.yaml; source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH"
+                                      "note":  "✓ Set skills.external_dirs = ~/.agents/skills in C:\\Users\\Yulin\\AppData\\Local\\hermes\\config.yaml; source=INSTALLED; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH"
                                   },
                        "gdrive":  {
                                       "status":  "RUNTIME",
