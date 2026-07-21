@@ -105,7 +105,7 @@
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "Windows Linux macOS CI gate",
-      "sha256": "0c8fc7039a13558372ee265ed53415a2a4e228829dfbbe181ff986fcb04ab5bc"
+      "sha256": "ba1317d4a2bcc87d5ae6fe6e8a609ea66acb37f5ac50b4d580eb1e2c95aa3023"
     }
   ],
   "generated": [
@@ -132,6 +132,6 @@
       "reason": "Notion Prompt is read-only"
     }
   ],
-  "sealed_at": "2026-07-21T15:14:11Z",
+  "sealed_at": "2026-07-21T15:20:23Z",
   "sealed_by": "Codex"
 }

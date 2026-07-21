@@ -4,14 +4,14 @@
 
 ## 目前做到哪
 
-全部收工 connector 已完成。
+收工完成，可安全換電腦、OS 或 Agent。
 
 ## 狀態
 
 - Phase：READY
-- Revision：18
-- Last action：complete-notion
-- Git：VERIFIED；branch=main；last_push=5c80f17
+- Revision：19
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=5c80f17
 
 ## 下一步
 
@@ -28,5 +28,5 @@
 
 ## 最後更新
 
-- 2026-07-21T15:18:57Z
+- 2026-07-21T15:20:27Z
 - Codex @ windows

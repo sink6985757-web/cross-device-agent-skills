@@ -3,11 +3,11 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 18,
+  "revision": 19,
   "session_id": null,
-  "summary": "全部收工 connector 已完成。",
-  "last_action": "complete-notion",
-  "updated_at": "2026-07-21T15:18:57Z",
+  "summary": "收工完成，可安全換電腦、OS 或 Agent。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T15:20:27Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
@@ -17,7 +17,7 @@
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "DIRTY",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -33,7 +33,7 @@
     "skills": {
       "status": "VERIFIED",
       "external_id": null,
-      "note": "source=INSTALLED; project-init=INSTALLED; startup=INSTALLED; shutdown=INSTALLED; notion-conversation-log=MATCH; adapters=VERIFIED"
+      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
     },
     "gdrive": {
       "status": "DETECTED",
