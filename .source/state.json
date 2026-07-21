@@ -2,18 +2,18 @@
     "schema_version":  1,
     "project_id":  "64851505-857c-4dd4-a9f1-064d82331b43",
     "project_name":  "Source project pipeline",
-    "phase":  "AWAITING_EXTERNAL",
-    "revision":  10,
+    "phase":  "READY",
+    "revision":  11,
     "session_id":  null,
-    "summary":  "本地收工完成；等待 connector：notion。",
-    "last_action":  "finish",
-    "updated_at":  "2026-07-21T14:40:03Z",
+    "summary":  "全部收工 connector 已完成。",
+    "last_action":  "complete-notion",
+    "updated_at":  "2026-07-21T14:42:34Z",
     "actor":  {
                   "agent":  "Agent",
                   "device":  "YULIN-SFG16-72"
               },
     "next_steps":  [
-                       "完成 notion connector。"
+                       "下次執行 `./source.ps1` 自動開工。"
                    ],
     "git":  {
                 "enabled":  true,
@@ -46,9 +46,9 @@
                                         "note":  "專案工作流程已更新並回讀"
                                     },
                        "notion":  {
-                                      "status":  "PENDING_AGENT",
-                                      "external_id":  null,
-                                      "note":  null
+                                      "status":  "VERIFIED",
+                                      "external_id":  "3a4367cc4e4c81239ac3d61ce049d370",
+                                      "note":  "2026-W30 同頁更新並回讀；Prompt 修改 0；父頁 W30 連結 1"
                                   },
                        "cdn":  {
                                    "status":  "NOT_CONFIGURED",
