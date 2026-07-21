@@ -4,30 +4,31 @@
 
 ## 目前做到哪
 
-收工完成，可安全換電腦、OS 或 Agent。
+本地收工完成；等待 connector：obsidian, notion。
 
 ## 狀態
 
-- Phase：READY
-- Revision：34
-- Last action：finish
-- Git：VERIFIED；branch=main；last_push=2921673
+- Phase：AWAITING_EXTERNAL
+- Revision：35
+- Last action：finish-preflight
+- Git：CLEAN；branch=main；last_push=2921673
 
 ## 下一步
 
-1. Command failed (~/AppData\Local\Microsoft\WinGet\Packages\twpayne.chezmoi_Microsoft.Winget.Source_8wekyb3d8bbwe\chezmoi.exe): chezmoi: ~/.codex\AGENTS.md: not managed
+1. 完成 obsidian connector，再執行 Source complete。
+2. 完成 notion connector，再執行 Source complete。
 
 ## Connectors
 
 - github：READY
-- skills：BLOCKED
+- skills：VERIFIED
 - gdrive：DETECTED
-- obsidian：VERIFIED
-- notion：VERIFIED
+- obsidian：PENDING_AGENT
+- notion：PENDING_AGENT
 - cdn：NOT_CONFIGURED
 - hub：HUB_READY
 
 ## 最後更新
 
-- 2026-07-21T16:28:57Z
-- Agent @ windows
+- 2026-07-21T16:31:50Z
+- Codex @ windows

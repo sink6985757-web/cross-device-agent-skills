@@ -2,22 +2,23 @@
   "schema_version": 3,
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
-  "phase": "READY",
-  "revision": 34,
-  "session_id": null,
-  "summary": "收工完成，可安全換電腦、OS 或 Agent。",
-  "last_action": "finish",
-  "updated_at": "2026-07-21T16:28:57Z",
+  "phase": "AWAITING_EXTERNAL",
+  "revision": 35,
+  "session_id": "a65e083e-2c85-4162-ad96-be68e513d0a7",
+  "summary": "本地收工完成；等待 connector：obsidian, notion。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T16:31:50Z",
   "actor": {
-    "agent": "Agent",
+    "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "Command failed (~/AppData\\Local\\Microsoft\\WinGet\\Packages\\twpayne.chezmoi_Microsoft.Winget.Source_8wekyb3d8bbwe\\chezmoi.exe): chezmoi: ~/.codex\\AGENTS.md: not managed"
+    "完成 obsidian connector，再執行 Source complete。",
+    "完成 notion connector，再執行 Source complete。"
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "CLEAN",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -31,9 +32,9 @@
       "note": null
     },
     "skills": {
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "external_id": "515618904e2b9dd2c9b7129ba5797b04c6ea0997",
-      "note": "Command failed (~/AppData\\Local\\Microsoft\\WinGet\\Packages\\twpayne.chezmoi_Microsoft.Winget.Source_8wekyb3d8bbwe\\chezmoi.exe): chezmoi: ~/.codex\\AGENTS.md: not managed"
+      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
     },
     "gdrive": {
       "status": "DETECTED",
@@ -41,12 +42,12 @@
       "note": null
     },
     "obsidian": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": "cross-device-agent-skills-master/專案工作流程.md",
       "note": null
     },
     "notion": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": "https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370",
       "note": null
     },
