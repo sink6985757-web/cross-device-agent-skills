@@ -3,11 +3,11 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "AWAITING_EXTERNAL",
-  "revision": 35,
-  "session_id": "a65e083e-2c85-4162-ad96-be68e513d0a7",
+  "revision": 36,
+  "session_id": null,
   "summary": "本地收工完成；等待 connector：obsidian, notion。",
-  "last_action": "finish-preflight",
-  "updated_at": "2026-07-21T16:31:50Z",
+  "last_action": "finish",
+  "updated_at": "2026-07-21T16:32:01Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
@@ -18,12 +18,12 @@
   ],
   "git": {
     "enabled": true,
-    "status": "CLEAN",
+    "status": "VERIFIED",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
     "behind": 0,
-    "last_push": "2921673"
+    "last_push": "ee1e24f"
   },
   "connectors": {
     "github": {
