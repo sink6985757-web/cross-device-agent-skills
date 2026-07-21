@@ -1,143 +1,150 @@
-# Source：跨電腦、跨 Agent 的專案工作流
+# 跨裝置 Agent 三技能
 
-> 對人只保留三個口令：**初始化專案、開工、收工**；對系統只保留一個核心：`source.py`。
+> 架構版本：**Three-Skill Lite v1.0.0**（2026-07-22）
 
-這個版本延續早期 Co-Agent 模板「低認知負擔、精簡交接、詳細脈絡分層保存」的優點，再以 Source 狀態機補上跨平台、可恢復、權威鎖、Hub／Child 隔離與誠實降級。
+這個 repository 只做三件事：初始化、開工、收工。每個技能只有 `SKILL.md` 與一份固定 `TEMPLATE.md`；每個專案只產生 `AGENTS.md` 與 `handoff.md` 兩個共用檔案。
 
-## 先記住這三句
+## 架構
 
-| 你說 | Source 動作 | 結果 |
+```text
+cross-device-agent-skills/
+├─ initial/
+│  ├─ SKILL.md
+│  └─ TEMPLATE.md
+├─ startup/
+│  ├─ SKILL.md
+│  └─ TEMPLATE.md
+├─ shutdown/
+│  ├─ SKILL.md
+│  └─ TEMPLATE.md
+├─ AGENTS.md
+├─ README.md
+├─ .gitattributes
+└─ .gitignore
+```
+
+| 口令 | 技能 | 作用 |
 |---|---|---|
-| `初始化專案` | `init`；多專案環境使用 `hub-init`／`child-create` | 建立不覆寫既有檔案的專案骨架 |
-| `開工` | `start`；中斷後使用 `next` | 讀取 checkpoint、檢查 Git 與 session lease |
-| `收工` | `finish`，再完成必要 connector | 保存 checkpoint、private GitHub 備份與外部紀錄 |
+| 初始化專案 | `initial` | 偵測本機工具、部署三技能、建立 `AGENTS.md` 與 `handoff.md` |
+| 開工 | `startup` | 只讀兩個專案檔與 Git 狀態，用固定模板回報 |
+| 收工 | `shutdown` | 更新交接、GitHub 與 Obsidian，用固定模板回報 |
 
-`project-init`、`startup`、`shutdown` 與 `notion-conversation-log` 都只是薄入口；真正邏輯只存在於 `source/scripts/source.py`，避免多份 SOP 漂移。
-
-## 四層資訊，各做一件事
-
-| 層級 | 保存內容 | 讀取時機 | 失敗時 |
-|---|---|---|---|
-| L1 專案 | `AGENTS.md`、`.source/state.json`、GENERATED `handoff.md` | 每次 Source 動作 | 核心層，不能略過 |
-| L2 GitHub | private Git、版本與回滾點 | 開工檢查、收工推送 | 明確標示 `BLOCKED`／`PARTIAL` |
-| L3 Obsidian | 決策原因、踩坑、詳細時間線 | 需要完整脈絡時 | 保留 checkpoint，稍後補寫 |
-| L4 Notion | Knowledge Master 的正式結論與週期頁 | 正式治理與跨專案索引 | 未回讀不得標 `VERIFIED` |
-
-Google Drive 只負責檔案同步，不被當成分散式鎖。每個 Child 擁有自己的 Git、state、session log 與 lease；Hub 只接收 UUID append-only event，避免多台電腦共用同一個可變 state 或 Git index。
-
-## 與原始 Co-Agent 模板的混合方式
-
-保留的概念：
-
-- 三個自然語言口令，使用者不必記住完整工具鏈。
-- 精簡 checkpoint 與詳細 Obsidian 脈絡分家。
-- GitHub 預設 private；缺工具時優雅降級，不假裝完成。
-- 任何 Agent 都先讀共同入口，不綁定單一 AI 產品。
-
-新版基準取代的部分：
-
-- 不再由三個 Skill 各自保存一份長 SOP；全部交給單一 Python engine。
-- 不把電腦名稱、磁碟路徑或 credential 寫入 canonical state。
-- 不手改 `.source/state.json` 或 `handoff.md`；兩者只能由 engine 產生。
-- 不用「上一台電腦名稱」推測併發安全；改用 Child 隔離、active lease 與 mutation lock。
-- Connector 使用 `VERIFIED`、`PARTIAL`、`BLOCKED`、`NOT_CONFIGURED` 等實際狀態，總覽不得掩蓋未完成項目。
-
-概念參考：[mathruffian-dot/cross-device-agent-skills](https://github.com/mathruffian-dot/cross-device-agent-skills)。參考庫未附授權檔；本專案只採用高階設計概念，文件與實作均依 Source 架構重寫。
+`AGENTS.md` 是所有 Agent 的共同專案說明；`handoff.md` 只保存最近一次交接。詳細決策與踩坑放 Obsidian，不塞進交接檔。
 
 ## 安裝
 
-### 必要條件
-
-- Git
-- Python 3
-- Windows PowerShell 5.1+，或 Linux／macOS 的 POSIX shell
-
-選用：
-
-- `gh`：登入與建立 private GitHub repository
-- `chezmoi`：同步 `~/.agents` 共用核心
-- Obsidian、Notion connector：啟用 L3／L4
-
-### Windows
+Repository 預設為 private，先登入 GitHub：
 
 ```powershell
 gh auth login
 gh repo clone sink6985757-web/cross-device-agent-skills
-Set-Location .\cross-device-agent-skills
-.\source.ps1 -Action bootstrap -Yes
-.\source.ps1 -Action doctor
 ```
 
-沒有 `gh` 時，可在已具備 GitHub 認證的環境使用 `git clone`。`-Yes` 只授權支援的依賴與技能部署；不會保存 token 或覆寫既有專案檔。
+### Windows PowerShell
+
+```powershell
+$repo = Resolve-Path .\cross-device-agent-skills
+$skills = Join-Path $HOME '.agents\skills'
+New-Item -ItemType Directory -Force -Path $skills | Out-Null
+Copy-Item -Recurse -Force "$repo\initial"  $skills
+Copy-Item -Recurse -Force "$repo\startup"  $skills
+Copy-Item -Recurse -Force "$repo\shutdown" $skills
+```
 
 ### Linux／macOS
 
 ```bash
 gh auth login
 gh repo clone sink6985757-web/cross-device-agent-skills
-cd cross-device-agent-skills
-./source.sh bootstrap --yes
-./source.sh doctor
+mkdir -p "$HOME/.agents/skills"
+cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills/"
 ```
 
-部署後，共用 Skill 的正式位置是 `~/.agents/skills`。Agent 專屬目錄只使用薄轉接或原生 discovery，不複製另一份 Skill。
+`~/.agents/skills` 是唯一正式 Skill 來源。Codex、Gemini、Claude、Hermes 或其他 Agent 若不能原生讀取這個位置，只建立 symlink／junction 或設定外部技能目錄，不再複製第二份內容。
 
-## 建立與使用專案
+## 使用
 
-最簡單的方式是直接對 Agent 說「初始化專案」、「開工」或「收工」。需要明確 CLI 時：
+### 1. 初始化專案
 
-### 單一專案
+在專案資料夾對 Agent 說：
 
-```powershell
-# Windows；在目標專案資料夾執行
-& "$HOME\.agents\skills\source\scripts\source.ps1" -Action init -ProjectRoot (Get-Location).Path -ProjectName "我的專案"
-.\source.ps1 -Action start
-.\source.ps1 -Action finish -CommitMessage "完成可驗證成果"
+```text
+初始化專案
 ```
+
+`initial` 會依 `initial/TEMPLATE.md` 檢查：
+
+- 這台機器的 OS、Git、GitHub CLI 與登入狀態。
+- 三技能是否已部署到共用技能目錄。
+- 專案是否已有 Git、remote、`AGENTS.md`、`handoff.md`。
+- 是否能定位 Obsidian vault。
+- 哪些可自動完成、哪些需要使用者登入或確認。
+
+初始化不覆寫既有檔案；GitHub repository 預設 private。
+
+### 2. 開工
+
+```text
+開工
+```
+
+`startup` 只讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，不修改檔案、不自動 pull。輸出固定使用 `startup/TEMPLATE.md`。
+
+### 3. 收工
+
+```text
+收工
+```
+
+`shutdown` 更新 `handoff.md`，必要時更新 `AGENTS.md` 路線圖；確認變更安全後 commit／push，並更新 `AGENTS.md` 登記的 Obsidian 筆記。輸出固定使用 `shutdown/TEMPLATE.md`。
+
+## 每個專案只需要的兩個檔案
+
+### `AGENTS.md`
+
+保存穩定資訊：專案目標、目錄、工作規則、GitHub、Obsidian 相對路徑與路線圖。所有 Agent 每次先讀本檔。
+
+### `handoff.md`
+
+保存變動資訊：目前做到哪、狀態、下一步、注意事項與最近一次 Git push。開工只讀，收工重寫，不累積長篇日誌。
+
+## GitHub 維護
+
+維護本技能 repository 時只提交以下 allowlist：
+
+```text
+AGENTS.md
+README.md
+.gitattributes
+.gitignore
+initial/
+startup/
+shutdown/
+```
+
+標準流程：
 
 ```bash
-# Linux／macOS；在目標專案資料夾執行
-python3 "$HOME/.agents/skills/source/scripts/source.py" init --project-root "$PWD" --project-name "我的專案"
-./source.sh start
-./source.sh finish --commit-message "完成可驗證成果"
+git status --short
+git diff --check
+git add AGENTS.md README.md .gitattributes .gitignore initial startup shutdown
+git commit -m "更新三技能架構：<摘要>"
+git push origin main
+gh repo view sink6985757-web/cross-device-agent-skills
 ```
 
-初始化採 `copy-if-missing`：已有 `SOURCE.md`、`AGENTS.md` 或其他專案檔時不覆寫。若要同時建立 private GitHub repository，加入 Windows `-CreateRemote -Yes` 或 Unix `--create-remote --yes`。
-
-### Hub／Child 多專案
-
-```powershell
-.\source.ps1 -Action hub-init -ProjectName "我的工作主幹"
-.\source.ps1 -Action child-create -ChildName "第一個專案"
-Set-Location .\projects\第一個專案
-.\source.ps1
-```
+不要提交 `.env`、token、key、credential、Agent cache 或未知 untracked 檔。發布新架構版本時更新本 README 的版本號，再建立 annotated tag：
 
 ```bash
-./source.sh hub-init --project-name "我的工作主幹"
-./source.sh child-create --child-name "第一個專案"
-cd projects/第一個專案
-./source.sh
+git tag -a v1.0.0 -m "Three-Skill Lite v1.0.0"
+git push origin v1.0.0
 ```
 
-無參數 Source 會依 state 自動選擇 `init`、`start` 或 `next`。主幹管理者可用 `hub-status` 查看全局，以 `hub-sync --yes` 收斂 Child 事件。
+## 版本與回滾
 
-## 權威、回滾與安全
+- `v1.x`：三技能 Lite 架構內的相容更新。
+- `v2.0.0`：輸出檔名或模板契約有破壞性變更。
+- 舊 Source 平台完整保留在 Git commit `52b9857`，未重寫歷史。
+- 若要回復舊版，建立一般 revert／restore commit；不要使用 `git reset --hard`。
 
-- `PROTECTED`：只能 `authority-unlock --yes → 修改 → 測試 → authority-seal --yes`。
-- `GENERATED`：只能由 Source engine 寫入。
-- canonical JSON 只保存 root-relative 路徑、URL 與外部 ID。
-- 不提交 `.env`、API key、token、cookie、私鑰、credential cache 或未知 untracked 檔。
-- Google Drive 不支援持久唯讀時顯示 `HASH_ENFORCED`，仍由 signature＋SHA-256 強制驗證。
-- 每次交接前執行 `doctor`；完整細節見 [SOURCE.md](SOURCE.md)。
-
-## 驗證
-
-```powershell
-python .\tests\source.tests.py
-python .\tests\hub.tests.py
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\source.tests.ps1
-.\source.ps1 -Action doctor
-```
-
-CI 會在 Windows、Ubuntu 與 macOS 重跑生命週期、Hub／Child、adapter 與 diff hygiene 測試。
+概念參考：[mathruffian-dot/cross-device-agent-skills](https://github.com/mathruffian-dot/cross-device-agent-skills)。本版本依個人跨 Agent 工作方式重新編寫。

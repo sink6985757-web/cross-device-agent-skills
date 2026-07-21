@@ -1,11 +1,10 @@
-# Agent entry — PROTECTED
+# Repository guidance
 
-本檔是跨 Agent 權威指標，不能直接修改；正式變更必須走 Source `authority-unlock → authority-seal`。
+本 repository 只維護三個 Skill：`initial`、`startup`、`shutdown`。
 
-1. Windows 執行 `./source.ps1 -Action next`；Linux／macOS 執行 `./source.sh next`。
-2. 只依 `SOURCE.md`、`.source/config.json`、`.source/state.json` 與 authority gate 判定下一步。
-3. `.source/state.json`、`handoff.md` 是 GENERATED，永遠不得手改。
-4. 結束時執行 Source `finish`；外部 connector 必須回讀後才能標示 `VERIFIED`。
-5. 不提交 secret、credential、裝置絕對路徑或未知 untracked 檔。
-6. `workspace.role=child` 時只修改該子專案；不得在子專案命令中操作主幹 Git index。
-7. `.source/hub/events/` 只新增唯一事件，`.source/hub/skill-proposals/` 只新增待審提案；不得覆寫、提升或自動安裝未知技能。
+1. 每個 Skill 只能包含 `SKILL.md` 與 `TEMPLATE.md`。
+2. `SKILL.md` 定義判斷與操作；`TEMPLATE.md` 定義固定輸出，不在多處複製同一規則。
+3. 初始化產生的專案共用檔固定為 `AGENTS.md` 與 `handoff.md`。
+4. 不加入狀態機、runtime engine、session database、Notion connector 或裝置絕對路徑。
+5. GitHub repository 維持 private；不提交 secret、credential、cache 或未知 untracked 檔。
+6. 架構、安裝、使用、GitHub 維護與版本規則以 `README.md` 為準。

@@ -1,12 +1,28 @@
 ---
 name: shutdown
-description: Source pipeline 的收工相容入口。當使用者說收工、結束、下班、同步、換電腦或保存進度時使用；把交接、GitHub、技能部署、chezmoi 與外部 connector checkpoint 交給 source。
+description: 專案收工、交接與同步。當使用者說收工、shutdown、結束、同步、下班或換電腦時使用；依固定模板更新 handoff.md、必要的 AGENTS.md、private GitHub 與 Obsidian。
 ---
 
 # Shutdown
 
-1. 讀取 `../source/SKILL.md`。
-2. 檢查 authority gate、變更與 commit 訊息後，以目前 OS 的 Source adapter 執行 `finish`；子專案會保存 session log、送回 append-only 主幹事件，未知技能只成為待審提案。
-3. 若輸出 `PENDING_AGENT`，只讀 `../source/references/connectors.md` 並完成指定 connector。
-4. 每完成一個 connector 就用 Source `complete` 回填；不得假裝成功。
-5. 主幹管理者最後執行 `hub-status` 與 `hub-sync`；子專案不得直接提交主幹 Git index。
+固定使用同目錄 `TEMPLATE.md`；「收工／同步」即授權執行可回復的專案內保存與既有 private remote push。
+
+## 流程
+
+1. 讀取 `AGENTS.md`、`handoff.md` 與本次對話，盤點實際完成、未完成、測試、風險與下一步；不得補造結果。
+2. 只有路線圖或穩定規則改變時才更新 `AGENTS.md`；使用 `TEMPLATE.md` 重寫精簡 `handoff.md`。
+3. 若有 Git：
+   - 先看 `git status --short` 與 diff。
+   - 只 stage 本次已知檔案；未知 untracked、secret 或 credential 一律停止。
+   - 使用具體繁體中文 commit 訊息，推送既有 private remote。
+   - 沒有 remote 或認證時標示 `PARTIAL`，保留本地 commit 或精確續跑點。
+4. 若 `AGENTS.md` 登記 Obsidian，更新既有專案筆記的「上次做到哪、決策／踩坑、最近更動」並回讀；找不到不得猜路徑。
+5. Git push 後再把實際結果回填 `handoff.md`；若因此產生第二個 commit，必須一併 push。
+6. 最後依 `TEMPLATE.md` 回報每一層狀態與唯一續跑點。
+
+## 不做
+
+- 不建立 public repository。
+- 不提交未知檔案或敏感資訊。
+- 不把長篇歷史塞進 `handoff.md`。
+- 不假報 GitHub、Obsidian 或同步成功。

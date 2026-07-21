@@ -1,11 +1,22 @@
 ---
 name: startup
-description: Source pipeline 的開工與續接相容入口。當使用者說開工、開始工作、繼續、下一步、工作到哪或換電腦接續時使用；把狀態判定交給 source，不重複載入完整 SOP。
+description: 專案開工與接續。當使用者說開工、startup、開始工作、繼續、下一步或上次做到哪時使用；只讀 AGENTS.md、handoff.md 與 Git 狀態，再依固定模板回報，不修改專案。
 ---
 
 # Startup
 
-1. 讀取 `../source/SKILL.md`。
-2. 以目前 OS 的 Source adapter 執行 `start`；中途中斷或只查狀態時執行 `next`。
-3. 開工只從核准 remote 檢查技能更新；同一子專案已有 active session 時沿用 checkpoint，不另開 writer。
-4. 不主動 pull；依輸出的 checkpoint 與唯一下一步續接。
+固定使用同目錄 `TEMPLATE.md`；本技能只有讀取與回報。
+
+## 流程
+
+1. 找到專案根目錄並讀取 `AGENTS.md`、`handoff.md`；任一缺少就標示 `PARTIAL`，建議先執行 `initial`，不得自行補建。
+2. 摘要目標、目前狀態、下一步與注意事項，不全文複述兩個檔案。
+3. 若有 Git，執行 read-only `git status --short --branch`；遠端存在時可 `git fetch`，但不得自動 pull、merge、checkout 或修改檔案。
+4. 若 `AGENTS.md` 登記 Obsidian，只列 vault-relative 路徑；只有 handoff 明確需要或使用者要求時才讀詳細筆記。
+5. 依 `TEMPLATE.md` 回報，下一步最多三項；完成後等待使用者選擇，不自行展開其他工作。
+
+## 不做
+
+- 不修改 `AGENTS.md`、`handoff.md`、Obsidian 或 Git。
+- 不根據電腦名稱判斷同步狀態。
+- 不宣稱未 fetch／未回讀的遠端狀態已驗證。
