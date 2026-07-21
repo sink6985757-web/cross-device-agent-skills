@@ -1,6 +1,6 @@
 ---
 name: source
-description: 跨 Windows、Linux、macOS 的單一專案生命週期技能。當使用者說 source、初始化、開工、收工、繼續、下一步、工作到哪、換電腦、換作業系統、部署技能或同步專案時使用；以可恢復狀態機、相對路徑與權威檔鎖定統一 GitHub、chezmoi、Obsidian、Notion 與可選 CDN connector。
+description: 跨 Windows、Linux、macOS 的單一專案生命週期技能。當使用者說 source、初始化、開工、收工、繼續、下一步、工作到哪、換電腦、換作業系統、建立主幹或子專案、部署技能或同步專案時使用；以可恢復狀態機、相對路徑、append-only 主幹事件與權威檔鎖定統一 GitHub、chezmoi、Obsidian、Notion 與可選 CDN connector。
 ---
 
 # Source
@@ -14,6 +14,7 @@ description: 跨 Windows、Linux、macOS 的單一專案生命週期技能。當
 3. 明確口令對應：初始化 → `init`、開工 → `start`、收工 → `finish`、下一步 → `next`。
 4. 不得手改 `.source/state.json` 或 `handoff.md`；它們只能由 engine 產生。
 5. 全新電腦、套件管理器或必要絕對路徑有疑問時讀 [platforms.md](references/platforms.md)。
+6. 多專案或雲端共享目錄先讀 [hub.md](references/hub.md)；空白 Notion 只在需要 connector 時讀 [notion-bootstrap.md](references/notion-bootstrap.md)。
 
 ```text
 Windows:       ./source.ps1 -Action doctor
@@ -34,6 +35,8 @@ Linux/macOS:  ./source.sh doctor
 ## 不變條件
 
 - 不自動 pull、不提交未知 untracked 或敏感檔；衝突先備份。
+- 同一子專案只允許一個 active session；主幹只新增唯一事件，子專案不得操作主幹 Git index。
+- 只自動更新 config 指定且通過 authority 驗證的技能 remote；其他技能只能提出待審 proposal。
 - private repo 與明確認證為預設；不保存 token、cookie、credential 或裝置絕對路徑。
 - Prompt 頁永遠只讀；Notion 同主題同週只更新原 Page ID。
 - 不覆寫既有專案檔；缺工具或權限時保存 checkpoint 與唯一下一步。

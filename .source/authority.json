@@ -7,35 +7,35 @@
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "single human and agent entry contract",
-      "sha256": "ac1567bfcfd3ae72c41d11114937282c70480da46f899859b31a7682b2b4ed46"
+      "sha256": "d0d77384709d9e6f02434600041d0a0b4a0f6a9e6a873f0b4c6761df90ceaab5"
     },
     {
       "path": "AGENTS.md",
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "cross-agent authority pointer",
-      "sha256": "c93e132f0c61acd5711803c97e7cc536a74ab8b9e92a88a2152a0470eddd9ec1"
+      "sha256": "8fad63357bb5d03cf3aebb88a68a6f2e90b48ef68823ab8c88b96349d43c4fab"
     },
     {
       "path": "README.md",
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "public project overview",
-      "sha256": "da25e07d0aaf4ee3d110be5385bb8c90cb27d47aba2ac7a8836379f7a15cdb34"
+      "sha256": "4862d0cf6e85dd020e133f30c5526c93fcced3d049fccd33f598943439eb3907"
     },
     {
       "path": ".source/config.json",
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "root-relative canonical configuration",
-      "sha256": "16550e39323ba50817a4ad08bbda7cd590643b7d0eab431aa156d51ab4759058"
+      "sha256": "1ced1c4749677cb9f42a582d748329f1f30dfd40c4cc6a299be33b4078b3fcc3"
     },
     {
       "path": "source.ps1",
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "Windows adapter",
-      "sha256": "b7355e2cffbf3f2c550475bfce72b3df1932c7d6b565b80ba99fa29c02c1db42"
+      "sha256": "42fa4e4aba13b17ce41b7da676a2a0f802d854226d5c0e447607d572cffe2108"
     },
     {
       "path": "source.sh",
@@ -49,63 +49,63 @@
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "cross-platform text contract",
-      "sha256": "18c6de4efe543cab26e45a2232cf304bf047a2db050b2b007a135edeaa86d55b"
+      "sha256": "b060a04c1494fb43fcd07bd77c3314677394dbf56c04848a31bf0ca01b7e3453"
     },
     {
       "path": ".gitignore",
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "secret and runtime exclusion contract",
-      "sha256": "c9a6646a24b75ffa86a597457894692e2e8ad7bba0a44c0ac12d008339ed1c48"
+      "sha256": "fac2e6ccec63167e88cdd751f3b34c26b8c44971d5922d557324682a10e18e5d"
     },
     {
       "path": "source",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "canonical skill and cross-platform engine",
-      "sha256": "28b4a9cb5b3f0e34673c949983f198878aeb6d7282bf09db3bd0b7d6e4f4560a"
+      "sha256": "f54c0e565ae04e74c9dd5cb6f322c079c62f383825f6dd823eabbe2173da1630"
     },
     {
       "path": "project-init",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "initialization compatibility adapter",
-      "sha256": "25c1b7edc287816e3e1512339640f4b7b23cf7524b20b4d0d4f3924367739969"
+      "sha256": "885736277ce8649c1e78e0c3bb085da4eae05924029ec8442f45e062c12b3f42"
     },
     {
       "path": "startup",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "startup compatibility adapter",
-      "sha256": "d46ef49f5c68f6f1c8749fa1e7a2be09e57535012d5ae8252be650ee02b9ca7b"
+      "sha256": "f82cee4683f2f3f0f5c09dc443089d4a10e5e855951f0bbaa8dda90864fde31d"
     },
     {
       "path": "shutdown",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "shutdown compatibility adapter",
-      "sha256": "02015d5946c1f723339e37788169c98032b6c1ad74e4eb376b77b63fa3e07285"
+      "sha256": "f4c6f491234af6882c9b54046eb4fc55c5366bc60d4dac70e3cbb0f95d108d77"
     },
     {
       "path": "notion-conversation-log",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "Notion compatibility adapter",
-      "sha256": "4e8d36deb1a9ea6fd03167af408baa9538896ff2a000c51759ab817c008702db"
+      "sha256": "551339005cef21b5a3135e01f832fbe72c1b3488b15f28e929581d0ad6995965"
     },
     {
       "path": "tests",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "validation contract",
-      "sha256": "b1a6f7bab3c95a39f5a3b8004d284a26dbe6e608176efe659a68f8828be850d8"
+      "sha256": "eb57a586a1df0b8eab0564d290da4da5dc5f9779018c57d488d33029c5f7f3da"
     },
     {
       "path": ".github",
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "Windows Linux macOS CI gate",
-      "sha256": "ba1317d4a2bcc87d5ae6fe6e8a609ea66acb37f5ac50b4d580eb1e2c95aa3023"
+      "sha256": "570252dd5979a1c66cb66cc235b4447bfb0c76232cf3add831d2576a9eb1d13c"
     }
   ],
   "generated": [
@@ -123,6 +123,21 @@
       "path": ".source/runtime/",
       "writer": "source-engine-only",
       "reason": "device-local formal-change marker; never commit"
+    },
+    {
+      "path": ".source/coordination/",
+      "writer": "source-engine-only",
+      "reason": "cloud-synced leases; never commit or hand edit"
+    },
+    {
+      "path": ".source/hub/",
+      "writer": "source-engine-only",
+      "reason": "append-only child descriptors, events, and skill proposals"
+    },
+    {
+      "path": "logs/sessions/",
+      "writer": "source-engine-only",
+      "reason": "project-local resumable session logs"
     }
   ],
   "external_read_only": [
@@ -132,6 +147,6 @@
       "reason": "Notion Prompt is read-only"
     }
   ],
-  "sealed_at": "2026-07-21T15:20:23Z",
+  "sealed_at": "2026-07-21T15:54:18Z",
   "sealed_by": "Codex"
 }

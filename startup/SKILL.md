@@ -7,4 +7,5 @@ description: Source pipeline 的開工與續接相容入口。當使用者說開
 
 1. 讀取 `../source/SKILL.md`。
 2. 以目前 OS 的 Source adapter 執行 `start`；中途中斷或只查狀態時執行 `next`。
-3. 不主動 pull；依輸出的 checkpoint 與唯一下一步續接。
+3. 開工只從核准 remote 檢查技能更新；同一子專案已有 active session 時沿用 checkpoint，不另開 writer。
+4. 不主動 pull；依輸出的 checkpoint 與唯一下一步續接。

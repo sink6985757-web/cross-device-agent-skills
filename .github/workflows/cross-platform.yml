@@ -25,7 +25,9 @@ jobs:
           git config --global user.name "Source CI"
           git config --global user.email "source-ci@example.invalid"
       - name: Cross-platform lifecycle
-        run: python tests/source.tests.py
+        run: |
+          python tests/source.tests.py
+          python tests/hub.tests.py
       - name: POSIX adapter
         if: runner.os != 'Windows'
         run: |

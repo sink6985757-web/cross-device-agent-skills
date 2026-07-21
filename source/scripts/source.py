@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import datetime as dt
 import hashlib
 import json
@@ -23,6 +24,8 @@ from typing import Any, Iterable
 ACTIONS = (
     "auto", "bootstrap", "init", "status", "next", "start", "finish",
     "doctor", "deploy-skills", "sync-dotfiles", "complete",
+    "hub-init", "child-create", "hub-status", "hub-sync",
+    "skills-check", "skills-update", "connector-bootstrap",
     "authority-check", "authority-lock", "authority-unlock", "authority-seal",
 )
 MANAGED_SKILLS = (
@@ -39,6 +42,7 @@ SCRIPT = Path(__file__).resolve()
 SKILL_ROOT = SCRIPT.parent.parent
 ASSET_ROOT = SKILL_ROOT / "assets"
 DISTRIBUTION_ROOT = SKILL_ROOT.parent
+DEFAULT_SKILL_REMOTE = "https://github.com/sink6985757-web/cross-device-agent-skills.git"
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -147,6 +151,115 @@ def write_text_atomic(path: Path, text: str) -> None:
 
 def write_json_atomic(path: Path, value: Any, root: Path | None = None) -> None:
     write_text_atomic(path, json.dumps(portable(value, root), ensure_ascii=False, indent=2))
+
+
+def parse_iso(value: str | None) -> dt.datetime | None:
+    if not value:
+        return None
+    try:
+        return dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def safe_relative(value: str, *, label: str = "path") -> str:
+    candidate = Path(value.replace("\\", "/"))
+    if candidate.is_absolute() or not candidate.parts or ".." in candidate.parts:
+        raise RuntimeError(f"{label} must be a root-relative path without '..'")
+    return candidate.as_posix()
+
+
+def workspace_settings(config: dict[str, Any]) -> dict[str, Any]:
+    defaults = {
+        "role": "standalone", "hub_root": None, "child_root": "projects",
+        "logs_root": "logs/sessions", "event_root": ".source/hub/events",
+        "coordination_root": ".source/coordination",
+    }
+    defaults.update(config.get("workspace") or {})
+    return defaults
+
+
+def resolve_hub(root: Path, config: dict[str, Any]) -> Path | None:
+    workspace = workspace_settings(config)
+    if workspace["role"] == "hub":
+        return root
+    relative = workspace.get("hub_root")
+    if not relative:
+        return None
+    candidate = (root / relative).resolve()
+    if not state_path(candidate).is_file():
+        raise RuntimeError("Configured hub_root is not an initialized Source workspace")
+    return candidate
+
+
+@contextmanager
+def mutation_guard(root: Path, action: str, ttl_minutes: int = 15):
+    """Best-effort cross-process guard; canonical data still uses append-only files."""
+    parent = root / ".source" / "coordination"
+    lock = parent / "mutation.lock"
+    token = uuid.uuid4().hex
+    parent.mkdir(parents=True, exist_ok=True)
+    for _ in range(2):
+        try:
+            lock.mkdir()
+            break
+        except FileExistsError:
+            lease = read_json(lock / "lease.json") or {}
+            expires = parse_iso(lease.get("expires_at"))
+            if expires and expires > dt.datetime.now(dt.timezone.utc):
+                raise RuntimeError(f"Concurrent Source mutation is active: {lease.get('action', 'unknown')}")
+            stale = parent / ("stale-" + uuid.uuid4().hex)
+            try:
+                os.replace(lock, stale)
+                make_tree_writable(stale)
+                shutil.rmtree(stale)
+            except OSError as exc:
+                raise RuntimeError("Stale cloud lock could not be reclaimed; wait for sync and retry") from exc
+    else:
+        raise RuntimeError("Could not acquire Source mutation lock")
+    write_json_atomic(lock / "lease.json", {
+        "schema_version": 1, "token": token, "action": action,
+        "acquired_at": now_iso(),
+        "expires_at": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(minutes=ttl_minutes)).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    }, root)
+    try:
+        yield
+    finally:
+        lease = read_json(lock / "lease.json") or {}
+        if lease.get("token") == token and lock.exists():
+            make_tree_writable(lock)
+            shutil.rmtree(lock)
+
+
+def active_lease_path(root: Path) -> Path:
+    return root / ".source" / "coordination" / "active.lock"
+
+
+def set_active_lease(root: Path, state: dict[str, Any], lease_hours: int) -> None:
+    lock = active_lease_path(root)
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    if lock.exists():
+        current = read_json(lock / "lease.json") or {}
+        expires = parse_iso(current.get("expires_at"))
+        if expires and expires > dt.datetime.now(dt.timezone.utc):
+            raise RuntimeError("This child project already has an active work session")
+        make_tree_writable(lock)
+        shutil.rmtree(lock)
+    lock.mkdir()
+    write_json_atomic(lock / "lease.json", {
+        "schema_version": 1, "project_id": state["project_id"],
+        "session_id": state["session_id"], "platform": system_name(),
+        "acquired_at": now_iso(),
+        "expires_at": (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=lease_hours)).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+    }, root)
+
+
+def release_active_lease(root: Path, session_id: str | None) -> None:
+    lock = active_lease_path(root)
+    lease = read_json(lock / "lease.json") or {}
+    if lock.exists() and (not session_id or lease.get("session_id") == session_id):
+        make_tree_writable(lock)
+        shutil.rmtree(lock)
 
 
 def sha256_file(path: Path) -> str:
@@ -392,12 +505,15 @@ def copy_if_missing(template: str, destination: Path, dry_run: bool) -> bool:
     return True
 
 
-def merge_gitignore(root: Path, dry_run: bool) -> None:
+def merge_gitignore(root: Path, dry_run: bool, role: str = "standalone") -> None:
     path = root / ".gitignore"
     required = (
         "desktop.ini", "*.tmp", "~$*", ".env", ".env.*", "*.key", "*.pem",
-        "credentials.*", ".source/backups/", ".source/runtime/", "__pycache__/", "*.pyc",
+        "credentials.*", ".source/backups/", ".source/runtime/",
+        ".source/coordination/", "__pycache__/", "*.pyc",
     )
+    if role == "hub":
+        required = (*required, "projects/*/")
     existing = path.read_text(encoding="utf-8-sig").splitlines() if path.exists() else []
     updated = existing + [item for item in required if item not in existing]
     if updated != existing and not dry_run:
@@ -590,27 +706,53 @@ def git_finish(root: Path, message: str, includes: list[str], dry_run: bool) -> 
     return {"status": "VERIFIED" if pushed.returncode == 0 else "PUSH_FAILED", "commit": commit, "pushed": pushed.returncode == 0}
 
 
-def new_config(name: str, root: Path) -> dict[str, Any]:
+def ensure_git_identity(root: Path) -> None:
+    if not git_snapshot(root)["enabled"]:
+        return
+    if not run(["git", "config", "user.name"], cwd=root, check=False).stdout.strip():
+        run(["git", "config", "user.name", "Source Bootstrap"], cwd=root)
+    if not run(["git", "config", "user.email"], cwd=root, check=False).stdout.strip():
+        run(["git", "config", "user.email", "source-bootstrap@example.invalid"], cwd=root)
+
+
+def new_config(
+    name: str, root: Path, *, role: str = "standalone", hub_root: str | None = None,
+) -> dict[str, Any]:
     snapshot = git_snapshot(root)
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "project_name": name,
         "project_kind": "standard",
         "default_branch": snapshot.get("branch") or "main",
+        "workspace": {
+            "role": role,
+            "hub_root": hub_root,
+            "child_root": "projects",
+            "logs_root": "logs/sessions",
+            "event_root": ".source/hub/events",
+            "coordination_root": ".source/coordination",
+        },
         "git": {
             "private_by_default": True,
             "remote": snapshot.get("remote"),
             "include_paths": [
                 ".source", "SOURCE.md", "AGENTS.md", "handoff.md", "source.ps1",
-                "source.sh", ".gitattributes", ".gitignore",
+                "source.sh", ".gitattributes", ".gitignore", "knowledge",
             ],
         },
-        "skills": {"managed": list(MANAGED_SKILLS), "sync_dotfiles": True},
+        "skills": {
+            "managed": list(MANAGED_SKILLS), "sync_dotfiles": True,
+            "remote": DEFAULT_SKILL_REMOTE, "branch": "main",
+            "update_policy": "auto-approved",
+        },
         "connectors": {
             "gdrive": {"enabled": True, "mode": "RUNTIME_DETECT"},
-            "obsidian": {"enabled": False, "mode": "AGENT", "relative_note": None},
+            "obsidian": {
+                "enabled": True, "mode": "LOCAL_VAULT",
+                "relative_note": "knowledge/obsidian/Project Log.md",
+            },
             "notion": {
-                "enabled": False, "mode": "AGENT", "knowledge_master": None,
+                "enabled": True, "mode": "AGENT", "knowledge_master": None,
                 "topic": None, "prompt": None, "period_page": None,
             },
             "cdn": {"enabled": False, "mode": "AGENT", "provider": None, "target": None},
@@ -620,7 +762,7 @@ def new_config(name: str, root: Path) -> dict[str, Any]:
 
 def new_state(name: str, agent: str) -> dict[str, Any]:
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "project_id": str(uuid.uuid4()),
         "project_name": name,
         "phase": "INITIALIZING",
@@ -637,6 +779,7 @@ def new_state(name: str, agent: str) -> dict[str, Any]:
         },
         "connectors": {
             "github": {"status": "NOT_CONFIGURED", "external_id": None, "note": None},
+            "hub": {"status": "NOT_CONFIGURED", "external_id": None, "note": None},
             "skills": {"status": "READY", "external_id": None, "note": None},
             "gdrive": {"status": "RUNTIME", "external_id": None, "note": None},
             "obsidian": {"status": "NOT_CONFIGURED", "external_id": None, "note": None},
@@ -650,8 +793,280 @@ def migrate_state(state: dict[str, Any]) -> dict[str, Any]:
     actor = state.setdefault("actor", {})
     actor.pop("device", None)
     actor["platform"] = system_name()
-    state["schema_version"] = 2
+    state.setdefault("connectors", {}).setdefault(
+        "hub", {"status": "NOT_CONFIGURED", "external_id": None, "note": None},
+    )
+    state["schema_version"] = 3
     return state
+
+
+def prepare_connector_files(root: Path, config: dict[str, Any], dry_run: bool) -> list[str]:
+    results: list[str] = []
+    obsidian = config.get("connectors", {}).get("obsidian", {})
+    if obsidian.get("enabled") and obsidian.get("relative_note"):
+        relative = safe_relative(obsidian["relative_note"], label="Obsidian relative_note")
+        destination = root / relative
+        if copy_if_missing("obsidian-project-log.template.md", destination, dry_run):
+            results.append(f"obsidian={relative}")
+    checkpoint = root / ".source" / "connectors" / "notion.json"
+    if config.get("connectors", {}).get("notion", {}).get("enabled") and not checkpoint.exists() and not dry_run:
+        write_json_atomic(checkpoint, {
+            "schema_version": 1, "status": "NEEDS_SETUP",
+            "instruction": "Authorize the Notion connector, create or select the project page, then run Source complete.",
+            "page_id": None, "prompt_policy": "READ_ONLY",
+        }, root)
+        results.append("notion=NEEDS_SETUP")
+    return results
+
+
+def session_log_path(root: Path, config: dict[str, Any], session_id: str) -> Path:
+    relative = safe_relative(workspace_settings(config)["logs_root"], label="logs_root")
+    return root / relative / f"{session_id}.json"
+
+
+def update_session_log(
+    root: Path, config: dict[str, Any], state: dict[str, Any], session_id: str,
+    event: str, *, summary: str | None = None,
+) -> Path:
+    path = session_log_path(root, config, session_id)
+    log = read_json(path) or {
+        "schema_version": 1, "project_id": state["project_id"],
+        "project_name": state["project_name"], "session_id": session_id,
+        "started_at": state.get("updated_at") or now_iso(), "events": [],
+    }
+    log["events"].append({"event": event, "at": now_iso(), "agent": state.get("actor", {}).get("agent")})
+    log["status"] = "WORKING" if event == "start" else "FINISHED"
+    if event == "finish":
+        log["finished_at"] = now_iso()
+    if summary:
+        log["summary"] = summary
+    write_json_atomic(path, log, root)
+    return path
+
+
+def publish_hub_event(
+    root: Path, config: dict[str, Any], state: dict[str, Any], event: str,
+    session_id: str | None, *, proposals: list[dict[str, str]] | None = None,
+) -> Path | None:
+    hub = resolve_hub(root, config)
+    if not hub or hub == root:
+        return None
+    assert_child(hub, root)
+    hub_config = read_json(config_path(hub)) or {}
+    if workspace_settings(hub_config)["role"] != "hub":
+        raise RuntimeError("Configured parent is not a Source hub")
+    event_root = safe_relative(workspace_settings(hub_config)["event_root"], label="event_root")
+    event_id = uuid.uuid4().hex
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    target = hub / event_root / state["project_id"] / f"{stamp}-{event_id}.json"
+    if target.exists():
+        raise RuntimeError("Append-only hub event collision")
+    write_json_atomic(target, {
+        "schema_version": 1, "event_id": event_id, "event": event,
+        "project_id": state["project_id"], "project_name": state["project_name"],
+        "project_path": root.relative_to(hub).as_posix(), "session_id": session_id,
+        "phase": state["phase"], "revision": state["revision"],
+        "summary": state["summary"], "created_at": now_iso(),
+        "git_commit": state.get("git", {}).get("last_push"),
+        "skill_proposals": proposals or [],
+    }, hub)
+    set_writable(target, False)
+    return target
+
+
+def publish_skill_proposals(
+    root: Path, config: dict[str, Any], state: dict[str, Any], session_id: str,
+) -> list[dict[str, str]]:
+    skills_root = root / "skills"
+    hub = resolve_hub(root, config)
+    if not hub or hub == root or not skills_root.is_dir():
+        return []
+    proposals: list[dict[str, str]] = []
+    for source in sorted(skills_root.iterdir(), key=lambda item: item.name.lower()):
+        if not source.is_dir() or not (source / "SKILL.md").is_file():
+            continue
+        name = re.sub(r"[^a-z0-9-]+", "-", source.name.lower()).strip("-")
+        if not name or name != source.name.lower():
+            raise RuntimeError(f"Invalid proposed skill directory: {source.name}")
+        for item in tree_files(source):
+            if item.is_symlink() or SENSITIVE.search(item.relative_to(source).as_posix()):
+                raise RuntimeError(f"Unsafe skill proposal content: {source.name}")
+        digest = directory_hash(source)
+        destination = hub / ".source" / "hub" / "skill-proposals" / state["project_id"] / session_id / name
+        if destination.exists():
+            raise RuntimeError(f"Skill proposal already exists: {name}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, destination, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        write_json_atomic(destination / "proposal.json", {
+            "schema_version": 1, "name": name, "sha256": digest,
+            "project_id": state["project_id"], "session_id": session_id,
+            "created_at": now_iso(), "status": "REVIEW_REQUIRED",
+        }, hub)
+        proposals.append({"name": name, "sha256": digest, "status": "REVIEW_REQUIRED"})
+    return proposals
+
+
+def approved_skill_status(
+    root: Path, config: dict[str, Any], state: dict[str, Any], *, apply: bool,
+) -> dict[str, str]:
+    skills = config.get("skills") or {}
+    remote = skills.get("remote")
+    branch = skills.get("branch") or "main"
+    if not remote:
+        return {"status": "NOT_CONFIGURED", "detail": "No approved skill remote configured"}
+    if os.environ.get("SOURCE_DISABLE_NETWORK") == "1":
+        return {"status": "SKIPPED", "detail": "Network skill check disabled by runtime"}
+    result = run(["git", "ls-remote", remote, f"refs/heads/{branch}"], check=False)
+    if result.returncode or not result.stdout.strip():
+        return {"status": "PARTIAL", "detail": "Approved skill remote is temporarily unavailable"}
+    commit = result.stdout.split()[0]
+    if config.get("project_kind") == "skill-distribution" and root.resolve() == DISTRIBUTION_ROOT.resolve():
+        snapshot = git_snapshot(root)
+        local_head = run(["git", "rev-parse", "HEAD"], cwd=root, check=False).stdout.strip() if snapshot["enabled"] else None
+        if snapshot.get("status") == "DIRTY" or (local_head and local_head != commit):
+            return {
+                "status": "LOCAL_WORKING_COPY",
+                "detail": "Canonical distribution checkout is newer or modified; remote downgrade is disabled",
+            }
+        if local_head == commit:
+            if apply:
+                state["connectors"]["skills"].update(
+                    status="VERIFIED", external_id=commit, note="Canonical distribution matches approved remote",
+                )
+            return {"status": "CURRENT", "detail": commit}
+    current = state.get("connectors", {}).get("skills", {}).get("external_id")
+    if current == commit:
+        return {"status": "CURRENT", "detail": commit}
+    if not apply:
+        return {"status": "UPDATE_AVAILABLE", "detail": commit}
+    temp_root = Path(tempfile.mkdtemp(prefix="source-approved-skills-"))
+    try:
+        clone = run(["git", "clone", "--depth", "1", "--branch", branch, remote, temp_root], check=False)
+        if clone.returncode:
+            return {"status": "PARTIAL", "detail": "Approved skill source could not be cloned"}
+        blocked = [detail for status, detail in authority_check(temp_root, require_locked=False) if status == "BLOCKED"]
+        if blocked:
+            return {"status": "BLOCKED", "detail": "Remote authority validation failed: " + "; ".join(blocked)}
+        installed = install_managed_skills(temp_root, yes=True, dry_run=False)
+        state["connectors"]["skills"].update(status="VERIFIED", external_id=commit, note="; ".join(installed))
+        return {"status": "UPDATED", "detail": commit}
+    finally:
+        make_tree_writable(temp_root)
+        shutil.rmtree(temp_root, ignore_errors=True)
+
+
+def connector_bootstrap(root: Path, args: argparse.Namespace) -> None:
+    ensure_authority(root)
+    config = read_json(config_path(root))
+    state = read_json(state_path(root))
+    with mutation_guard(root, "connector-bootstrap"):
+        results = prepare_connector_files(root, config, args.dry_run)
+        obsidian = config["connectors"]["obsidian"]
+        if obsidian.get("enabled"):
+            state["connectors"]["obsidian"].update(
+                status="LOCAL_READY", external_id=obsidian.get("relative_note"),
+                note="Project-local Obsidian-compatible vault",
+            )
+        notion = config["connectors"]["notion"]
+        if notion.get("enabled") and not notion.get("period_page"):
+            state["connectors"]["notion"].update(
+                status="NEEDS_SETUP", note="Authorize connector and create/select a project page",
+            )
+        save_checkpoint(root, state, action="connector-bootstrap", next_steps=[
+            "如需 Notion，授權 connector 並建立或選擇專案頁後執行 Source complete。",
+        ], agent=args.agent)
+    print("CONNECTORS: " + (", ".join(results) if results else "already prepared"))
+    show_status(root)
+
+
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^\w-]+", "-", value.lower(), flags=re.UNICODE).replace("_", "-").strip("-")
+    if not slug:
+        slug = "project-" + uuid.uuid4().hex[:8]
+    reserved = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)), *(f"lpt{i}" for i in range(1, 10))}
+    if slug.lower() in reserved:
+        slug = "project-" + slug
+    if len(slug) > 64:
+        slug = slug[:48].rstrip("-") + "-" + hashlib.sha256(value.encode("utf-8")).hexdigest()[:8]
+    return slug
+
+
+def child_create(root: Path, args: argparse.Namespace) -> None:
+    ensure_authority(root)
+    config = read_json(config_path(root))
+    if workspace_settings(config)["role"] != "hub":
+        raise RuntimeError("child-create must run from a Source hub")
+    if not args.child_name:
+        raise RuntimeError("--child-name is required")
+    slug = slugify(args.child_name)
+    relative = args.child_path or f"{workspace_settings(config)['child_root']}/{slug}"
+    relative = safe_relative(relative, label="child_path")
+    child = (root / relative).resolve()
+    assert_child(root, child)
+    if child.exists() and any(child.iterdir()):
+        raise RuntimeError(f"Child target is not empty: {relative}")
+    child_args = argparse.Namespace(**vars(args))
+    child_args.project_root = str(child)
+    child_args.project_name = args.child_name
+    child_args.workspace_role = "child"
+    child_args.hub_root = Path(os.path.relpath(root, child)).as_posix()
+    initialize(child, child_args)
+    child_state = read_json(state_path(child))
+    child_state["connectors"]["hub"].update(
+        status="READY", external_id="hub", note="Parent hub is configured by relative path",
+    )
+    save_checkpoint(
+        child, child_state, action="child-register",
+        next_steps=["執行 Source 自動開工。"], agent=args.agent,
+    )
+    ensure_git_identity(child)
+    git_finish(child, f"初始化 Source 子專案：{args.child_name}", [
+        ".source", "SOURCE.md", "AGENTS.md", "handoff.md", "source.ps1",
+        "source.sh", ".gitattributes", ".gitignore", "knowledge",
+    ], args.dry_run)
+    child_state = read_json(state_path(child))
+    descriptor = root / ".source" / "hub" / "projects" / f"{child_state['project_id']}.json"
+    write_json_atomic(descriptor, {
+        "schema_version": 1, "project_id": child_state["project_id"],
+        "project_name": args.child_name, "project_path": relative,
+        "created_at": now_iso(), "status": "ACTIVE",
+    }, root)
+    set_writable(descriptor, False)
+    publish_hub_event(child, read_json(config_path(child)), child_state, "initialized", None)
+    print(f"CHILD CREATED: {relative}")
+    print(f"NEXT: run Source in {relative}")
+
+
+def hub_status(root: Path) -> None:
+    config = read_json(config_path(root)) or {}
+    if workspace_settings(config)["role"] != "hub":
+        raise RuntimeError("hub-status must run from a Source hub")
+    descriptors = sorted((root / ".source" / "hub" / "projects").glob("*.json"))
+    event_root = root / workspace_settings(config)["event_root"]
+    print(f"HUB: projects={len(descriptors)}")
+    for descriptor_path in descriptors:
+        descriptor = read_json(descriptor_path)
+        child = root / descriptor["project_path"]
+        child_state = read_json(state_path(child)) or {}
+        events = list((event_root / descriptor["project_id"]).glob("*.json"))
+        active = read_json(active_lease_path(child) / "lease.json") or {}
+        lease_state = "ACTIVE" if parse_iso(active.get("expires_at")) and parse_iso(active.get("expires_at")) > dt.datetime.now(dt.timezone.utc) else "IDLE"
+        print(
+            f"- {descriptor['project_name']} | {descriptor['project_path']} | "
+            f"phase={child_state.get('phase', 'MISSING')} | lease={lease_state} | events={len(events)}"
+        )
+
+
+def hub_sync(root: Path, args: argparse.Namespace) -> None:
+    ensure_authority(root)
+    config = read_json(config_path(root)) or {}
+    if workspace_settings(config)["role"] != "hub":
+        raise RuntimeError("hub-sync must run from a Source hub")
+    with mutation_guard(root, "hub-sync"):
+        result = git_finish(
+            root, args.commit_message or "同步 Source 子專案事件", [".source/hub"], args.dry_run,
+        )
+    print(f"HUB SYNC: {result['status']} commit={result.get('commit')}")
 
 
 def write_handoff(root: Path, state: dict[str, Any]) -> None:
@@ -731,7 +1146,9 @@ def initialize(root: Path, args: argparse.Namespace) -> None:
     if not args.dry_run:
         root.mkdir(parents=True, exist_ok=True)
     name = args.project_name or root.name
-    config = new_config(name, root)
+    role = getattr(args, "workspace_role", None) or "standalone"
+    hub_root = getattr(args, "hub_root", None)
+    config = new_config(name, root, role=role, hub_root=hub_root)
     state = new_state(name, args.agent)
     if not args.dry_run:
         (root / ".source").mkdir(parents=True, exist_ok=True)
@@ -750,7 +1167,8 @@ def initialize(root: Path, args: argparse.Namespace) -> None:
     if not args.dry_run and os.name != "nt":
         launcher = root / "source.sh"
         launcher.chmod(launcher.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    merge_gitignore(root, args.dry_run)
+    merge_gitignore(root, args.dry_run, role)
+    prepare_connector_files(root, config, args.dry_run)
     if not command_exists("git"):
         state["connectors"]["github"].update(status="BLOCKED", note="git missing")
     elif not (root / ".git").exists() and not args.dry_run:
@@ -773,7 +1191,20 @@ def initialize(root: Path, args: argparse.Namespace) -> None:
         update_git_state(root, state)
         state["connectors"]["github"]["status"] = "READY"
     state["phase"] = "READY"
-    state["summary"] = "Source pipeline 初始化完成；可開始工作。"
+    state["summary"] = f"Source {role} pipeline 初始化完成；可開始工作。"
+    if config["connectors"]["obsidian"]["enabled"]:
+        state["connectors"]["obsidian"].update(
+            status="LOCAL_READY", external_id=config["connectors"]["obsidian"]["relative_note"],
+            note="Project-local Obsidian-compatible vault",
+        )
+    if config["connectors"]["notion"]["enabled"] and not config["connectors"]["notion"].get("period_page"):
+        state["connectors"]["notion"].update(
+            status="NEEDS_SETUP", note="Authorize connector and create/select a project page",
+        )
+    if role == "hub":
+        state["connectors"]["hub"].update(status="HUB_READY", note="Append-only hub event receiver")
+    elif role == "child":
+        state["connectors"]["hub"].update(status="READY", external_id="hub", note="Relative parent hub")
     if not args.dry_run:
         authority_seal(root, yes=True, agent=args.agent)
         save_checkpoint(root, state, action="init", next_steps=["執行 Source 自動開工。"], agent=args.agent)
@@ -791,21 +1222,41 @@ def start_project(root: Path, args: argparse.Namespace) -> None:
         show_status(root)
         return
     config = read_json(config_path(root))
-    update_git_state(root, state, fetch=True)
-    for name in ("obsidian", "notion"):
-        if config["connectors"][name]["enabled"] and state["connectors"][name]["status"] == "NOT_CONFIGURED":
-            state["connectors"][name]["status"] = "READY_AGENT"
-    cloud_tokens = ("google drive", "my drive", "雲端硬碟")
-    state["connectors"]["gdrive"]["status"] = "DETECTED" if any(token in str(root).lower() for token in cloud_tokens) else "RUNTIME"
-    state["phase"] = "WORKING"
-    state["session_id"] = str(uuid.uuid4())
-    state["summary"] = "已開工，可依下一步繼續。"
-    steps = state.get("next_steps") or []
-    if not steps or "Source" in steps[0] or "source" in steps[0]:
-        steps = ["在本次任務中完成一個可驗證成果。"]
-    if state["git"]["behind"]:
-        steps.insert(0, f"遠端領先 {state['git']['behind']} commits；檢查本地變更後再決定是否 pull。")
-    save_checkpoint(root, state, action="start", next_steps=steps, agent=args.agent)
+    with mutation_guard(root, "start"):
+        role = workspace_settings(config)["role"]
+        if role == "hub":
+            state["connectors"]["hub"].update(status="HUB_READY", note="Append-only hub event receiver")
+        elif role == "child":
+            state["connectors"]["hub"].update(status="READY", external_id="hub", note="Relative parent hub")
+        update_git_state(root, state, fetch=True)
+        for name in ("obsidian", "notion"):
+            if config["connectors"][name]["enabled"] and state["connectors"][name]["status"] == "NOT_CONFIGURED":
+                state["connectors"][name]["status"] = "READY_AGENT"
+        cloud_tokens = ("google drive", "my drive", "雲端硬碟")
+        state["connectors"]["gdrive"]["status"] = "DETECTED" if any(token in str(root).lower() for token in cloud_tokens) else "RUNTIME"
+        skill_result = approved_skill_status(
+            root, config, state,
+            apply=(config.get("skills", {}).get("update_policy") == "auto-approved"),
+        )
+        if skill_result["status"] in ("PARTIAL", "BLOCKED"):
+            state["connectors"]["skills"].update(status=skill_result["status"], note=skill_result["detail"])
+        state["phase"] = "WORKING"
+        state["session_id"] = str(uuid.uuid4())
+        set_active_lease(root, state, args.lease_hours)
+        state["summary"] = "已開工，可依下一步繼續。"
+        steps = state.get("next_steps") or []
+        if not steps or "Source" in steps[0] or "source" in steps[0]:
+            steps = ["在本次任務中完成一個可驗證成果。"]
+        if state["git"]["behind"]:
+            steps.insert(0, f"遠端領先 {state['git']['behind']} commits；檢查本地變更後再決定是否 pull。")
+        save_checkpoint(root, state, action="start", next_steps=steps, agent=args.agent)
+        update_session_log(root, config, state, state["session_id"], "start")
+        event = publish_hub_event(root, config, state, "start", state["session_id"])
+        if event:
+            state["connectors"]["hub"].update(
+                status="PUBLISHED", external_id=event.name, note="Append-only start event",
+            )
+            save_checkpoint(root, state, action="start-published", next_steps=steps, agent=args.agent)
     show_status(root)
 
 
@@ -819,40 +1270,63 @@ def finish_project(root: Path, args: argparse.Namespace) -> None:
     state = read_json(state_path(root))
     if not state:
         raise RuntimeError("Project is not initialized")
-    state["phase"] = "FINISHING"
-    state["summary"] = "正在保存 checkpoint 與同步可用層級。"
-    steps: list[str] = []
-    if config.get("project_kind") == "skill-distribution":
-        try:
-            installed = install_managed_skills(DISTRIBUTION_ROOT, yes=args.yes, dry_run=args.dry_run)
-            state["connectors"]["skills"].update(status="VERIFIED", note="; ".join(installed))
-            dotfiles = sync_dotfiles(yes=args.yes, dry_run=args.dry_run, message="同步 Source pipeline 與相容技能")
-            if dotfiles["status"] != "VERIFIED":
-                steps.append(dotfiles["detail"])
-        except Exception as exc:  # keep checkpoint even when an optional layer fails
-            state["connectors"]["skills"].update(status="BLOCKED", note=str(exc))
-            steps.append(str(exc))
-    if not args.skip_connectors:
-        for name in ("obsidian", "notion", "cdn"):
-            if config["connectors"][name]["enabled"]:
-                state["connectors"][name]["status"] = "PENDING_AGENT"
-                steps.append(f"完成 {name} connector，再執行 Source complete。")
-            elif name == "cdn":
-                state["connectors"]["cdn"]["status"] = "NOT_CONFIGURED"
-    pending = pending_connectors(state)
-    state["phase"] = "AWAITING_EXTERNAL" if pending else "READY"
-    state["session_id"] = None
-    state["summary"] = f"本地收工完成；等待 connector：{', '.join(pending)}。" if pending else "收工完成，可安全換電腦、OS 或 Agent。"
-    if not steps:
-        steps = [f"完成 {name} connector。" for name in pending] if pending else ["下一台電腦執行 Source 即可自動開工。"]
-    update_git_state(root, state)
-    save_checkpoint(root, state, action="finish-preflight", next_steps=steps, agent=args.agent)
-    if not args.skip_git:
-        first = git_finish(root, args.commit_message or f"收工：{state['project_name']}", args.include, args.dry_run)
-        if first["commit"]:
-            state["git"]["last_push"] = first["commit"][:7]
-            state["git"]["status"] = first["status"]
-            save_checkpoint(root, state, action="finish", next_steps=steps, agent=args.agent)
+    with mutation_guard(root, "finish"):
+        session_id = state.get("session_id") or str(uuid.uuid4())
+        role = workspace_settings(config)["role"]
+        if role == "hub":
+            state["connectors"]["hub"].update(status="HUB_READY", note="Append-only hub event receiver")
+        elif role == "child":
+            state["connectors"]["hub"].update(status="READY", external_id="hub", note="Relative parent hub")
+        state["session_id"] = session_id
+        state["phase"] = "FINISHING"
+        state["summary"] = "正在保存 checkpoint 與同步可用層級。"
+        steps: list[str] = []
+        if config.get("project_kind") == "skill-distribution":
+            try:
+                installed = install_managed_skills(DISTRIBUTION_ROOT, yes=args.yes, dry_run=args.dry_run)
+                state["connectors"]["skills"].update(status="VERIFIED", note="; ".join(installed))
+                dotfiles = sync_dotfiles(yes=args.yes, dry_run=args.dry_run, message="同步 Source pipeline 與相容技能")
+                if dotfiles["status"] != "VERIFIED":
+                    steps.append(dotfiles["detail"])
+            except Exception as exc:  # keep checkpoint even when an optional layer fails
+                state["connectors"]["skills"].update(status="BLOCKED", note=str(exc))
+                steps.append(str(exc))
+        if not args.skip_connectors:
+            for name in ("obsidian", "notion", "cdn"):
+                if config["connectors"][name]["enabled"]:
+                    state["connectors"][name]["status"] = "PENDING_AGENT"
+                    steps.append(f"完成 {name} connector，再執行 Source complete。")
+                elif name == "cdn":
+                    state["connectors"]["cdn"]["status"] = "NOT_CONFIGURED"
+        pending = pending_connectors(state)
+        final_phase = "AWAITING_EXTERNAL" if pending else "READY"
+        state["phase"] = final_phase
+        state["summary"] = f"本地收工完成；等待 connector：{', '.join(pending)}。" if pending else "收工完成，可安全換電腦、OS 或 Agent。"
+        if not steps:
+            steps = [f"完成 {name} connector。" for name in pending] if pending else ["下一台電腦執行 Source 即可自動開工。"]
+        update_git_state(root, state)
+        log_path = update_session_log(root, config, state, session_id, "finish", summary=state["summary"])
+        proposals = publish_skill_proposals(root, config, state, session_id)
+        save_checkpoint(root, state, action="finish-preflight", next_steps=steps, agent=args.agent)
+        git_includes = list(dict.fromkeys([*(config.get("git", {}).get("include_paths") or []), *args.include]))
+        relative_log = log_path.relative_to(root).as_posix()
+        if relative_log not in git_includes:
+            git_includes.append(relative_log)
+        if not args.skip_git:
+            first = git_finish(root, args.commit_message or f"收工：{state['project_name']}", git_includes, args.dry_run)
+            if first["commit"]:
+                state["git"]["last_push"] = first["commit"][:7]
+                state["git"]["status"] = first["status"]
+        state["session_id"] = None
+        save_checkpoint(root, state, action="finish", next_steps=steps, agent=args.agent)
+        event = publish_hub_event(root, config, state, "finish", session_id, proposals=proposals)
+        if event:
+            state["connectors"]["hub"].update(
+                status="PUBLISHED", external_id=event.name, note="Append-only finish event",
+            )
+            save_checkpoint(root, state, action="finish-published", next_steps=steps, agent=args.agent)
+        release_active_lease(root, session_id)
+        if not args.skip_git:
             git_finish(root, "回填 Source 收工狀態", [], args.dry_run)
     show_status(root)
 
@@ -910,6 +1384,33 @@ def doctor(root: Path) -> int:
     for status_value, detail in authority_check(root, require_locked=True):
         checks.append(("authority-gate", status_value, detail))
     current_config = read_json(config_path(root)) or {}
+    workspace = workspace_settings(current_config)
+    role = workspace.get("role")
+    checks.append(("workspace-role", "PASS" if role in ("standalone", "hub", "child") else "BLOCKED", str(role)))
+    for key in ("child_root", "logs_root", "event_root", "coordination_root"):
+        try:
+            safe_relative(str(workspace[key]), label=key)
+            checks.append((f"portable:{key}", "PASS", str(workspace[key])))
+        except RuntimeError as exc:
+            checks.append((f"portable:{key}", "BLOCKED", str(exc)))
+    if role == "child":
+        hub_relative = workspace.get("hub_root")
+        invalid_hub = not hub_relative or Path(str(hub_relative)).is_absolute()
+        checks.append(("child-hub-root", "BLOCKED" if invalid_hub else "PASS", str(hub_relative)))
+    if role == "hub":
+        ignored = (root / ".gitignore").read_text(encoding="utf-8-sig") if (root / ".gitignore").is_file() else ""
+        for pattern in (".source/coordination/", "projects/*/"):
+            checks.append((f"gitignore:{pattern}", "PASS" if pattern in ignored else "BLOCKED", "cloud/Git isolation rule"))
+        event_ids: list[str] = []
+        malformed = 0
+        event_root = root / workspace["event_root"]
+        for path in event_root.rglob("*.json") if event_root.is_dir() else []:
+            event = read_json(path) or {}
+            if not event.get("event_id") or path.stem.split("-")[-1] != event.get("event_id"):
+                malformed += 1
+            event_ids.append(event.get("event_id"))
+        unique = len(event_ids) == len(set(event_ids)) and malformed == 0
+        checks.append(("hub-events", "PASS" if unique else "BLOCKED", f"append_only_unique={len(event_ids)}"))
     requires_github_auth = bool((current_config.get("git") or {}).get("remote"))
     if command_exists("gh") and requires_github_auth:
         auth = run(["gh", "auth", "status"], check=False)
@@ -929,6 +1430,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--action", choices=ACTIONS, default=None)
     parser.add_argument("--project-root", default=os.getcwd())
     parser.add_argument("--project-name")
+    parser.add_argument("--workspace-role", choices=("standalone", "hub", "child"), default="standalone")
+    parser.add_argument("--hub-root")
+    parser.add_argument("--child-name")
+    parser.add_argument("--child-path")
+    parser.add_argument("--lease-hours", type=int, default=12)
     parser.add_argument("--agent", default="Agent")
     parser.add_argument("--commit-message")
     parser.add_argument("--include", action="append", default=[])
@@ -948,7 +1454,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
-    root = resolve_root(args.project_root, args.action in ("init", "bootstrap"))
+    if args.lease_hours < 1 or args.lease_hours > 168:
+        print("BLOCKED: --lease-hours must be between 1 and 168", file=sys.stderr)
+        return 1
+    root = resolve_root(args.project_root, args.action in ("init", "bootstrap", "hub-init"))
     try:
         if args.action == "auto":
             state = read_json(state_path(root))
@@ -959,6 +1468,23 @@ def main(argv: list[str] | None = None) -> int:
             initialize(root, args)
         elif args.action == "init":
             initialize(root, args)
+        elif args.action == "hub-init":
+            args.workspace_role = "hub"
+            initialize(root, args)
+            if state_path(root).is_file() and not args.dry_run:
+                ensure_git_identity(root)
+                config = read_json(config_path(root))
+                git_finish(
+                    root, f"初始化 Source 主幹：{config['project_name']}",
+                    config.get("git", {}).get("include_paths") or [], args.dry_run,
+                )
+        elif args.action == "child-create":
+            with mutation_guard(root, "child-create"):
+                child_create(root, args)
+        elif args.action == "hub-status":
+            hub_status(root)
+        elif args.action == "hub-sync":
+            hub_sync(root, args)
         elif args.action in ("status", "next"):
             show_status(root)
         elif args.action == "start":
@@ -973,6 +1499,23 @@ def main(argv: list[str] | None = None) -> int:
         elif args.action == "sync-dotfiles":
             result = sync_dotfiles(yes=args.yes, dry_run=args.dry_run, message="同步 Source pipeline 與共用 Agent 核心")
             print(f"{result['status']}: {result['detail']}")
+        elif args.action in ("skills-check", "skills-update"):
+            ensure_authority(root)
+            config = read_json(config_path(root))
+            state = read_json(state_path(root))
+            if args.action == "skills-update":
+                with mutation_guard(root, "skills-update"):
+                    result = approved_skill_status(root, config, state, apply=True)
+                    save_checkpoint(
+                        root, state, action="skills-update",
+                        next_steps=state.get("next_steps"), agent=args.agent,
+                    )
+            else:
+                result = approved_skill_status(root, config, state, apply=False)
+            print(f"SKILLS: {result['status']} {result['detail']}")
+            return 1 if result["status"] == "BLOCKED" else 0
+        elif args.action == "connector-bootstrap":
+            connector_bootstrap(root, args)
         elif args.action == "complete":
             complete_connector(root, args)
         elif args.action == "authority-check":

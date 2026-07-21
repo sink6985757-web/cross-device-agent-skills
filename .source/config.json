@@ -1,8 +1,16 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project_name": "Source project pipeline",
   "project_kind": "skill-distribution",
   "default_branch": "main",
+  "workspace": {
+    "role": "hub",
+    "hub_root": null,
+    "child_root": "projects",
+    "logs_root": "logs/sessions",
+    "event_root": ".source/hub/events",
+    "coordination_root": ".source/coordination"
+  },
   "git": {
     "private_by_default": true,
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
@@ -27,7 +35,10 @@
   },
   "skills": {
     "managed": ["source", "project-init", "startup", "shutdown", "notion-conversation-log"],
-    "sync_dotfiles": true
+    "sync_dotfiles": true,
+    "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
+    "branch": "main",
+    "update_policy": "auto-approved"
   },
   "connectors": {
     "gdrive": {

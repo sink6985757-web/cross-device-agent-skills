@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
+  "project_name": "Source project pipeline",
+  "session_id": "71fb4904-6505-4fd9-a503-bd5578cb2c50",
+  "started_at": "2026-07-21T15:35:29Z",
+  "events": [
+    {
+      "event": "finish",
+      "at": "2026-07-21T15:55:04Z",
+      "agent": "Codex"
+    }
+  ],
+  "status": "FINISHED",
+  "finished_at": "2026-07-21T15:55:04Z",
+  "summary": "本地收工完成；等待 connector：obsidian, notion。"
+}

@@ -1,23 +1,24 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
-  "phase": "READY",
-  "revision": 20,
-  "session_id": null,
-  "summary": "收工完成，可安全換電腦、OS 或 Agent。",
-  "last_action": "finish",
-  "updated_at": "2026-07-21T15:20:32Z",
+  "phase": "AWAITING_EXTERNAL",
+  "revision": 22,
+  "session_id": "71fb4904-6505-4fd9-a503-bd5578cb2c50",
+  "summary": "本地收工完成；等待 connector：obsidian, notion。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T15:55:04Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "下一台電腦執行 Source 即可自動開工。"
+    "完成 obsidian connector，再執行 Source complete。",
+    "完成 notion connector，再執行 Source complete。"
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "DIRTY",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -33,7 +34,7 @@
     "skills": {
       "status": "VERIFIED",
       "external_id": null,
-      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
+      "note": "source=INSTALLED; project-init=INSTALLED; startup=INSTALLED; shutdown=INSTALLED; notion-conversation-log=INSTALLED; adapters=VERIFIED"
     },
     "gdrive": {
       "status": "DETECTED",
@@ -41,12 +42,12 @@
       "note": null
     },
     "obsidian": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": null,
       "note": "跨系統架構、authority 邊界、三 OS CI 與最終 commits 已更新並回讀"
     },
     "notion": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": "3a4367cc4e4c81239ac3d61ce049d370",
       "note": "2026-W30 同頁更新並回讀；跨系統與 authority 證據完成；Prompt 修改 0；父頁 W30 連結 1"
     },
@@ -54,6 +55,11 @@
       "status": "NOT_CONFIGURED",
       "external_id": null,
       "note": null
+    },
+    "hub": {
+      "status": "HUB_READY",
+      "external_id": null,
+      "note": "Append-only hub event receiver"
     }
   }
 }

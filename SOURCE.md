@@ -1,79 +1,81 @@
-# SOURCE：跨系統唯一入口
+# SOURCE — 唯一入口（PROTECTED）
 
-只需依作業系統執行同一個 Source 概念：
+不論新電腦、換作業系統、中途中斷或一般工作，都只從這裡開始：
 
 ```text
 Windows       ./source.ps1
 Linux/macOS   ./source.sh
 ```
 
-無參數會自動判定：沒有 state → 初始化；`READY` → 開工；工作中／等待外部 → 顯示 checkpoint 與唯一下一步。
+無參數會自動判斷：未初始化就建立、`READY` 就開工、工作中或等待外部服務就顯示唯一下一步。不得手改 `.source/state.json`、`handoff.md` 或權威檔。
 
-## 全新電腦一鍵部署
+## 全新環境
 
-私有 repository 的首次登入不能繞過。先完成 `gh auth login`，或由已授權的 Google Drive／USB 取得本 repository，再執行一次 bootstrap。
-
-### Windows
+先 clone 私有技能發行庫，再於預定主幹目錄執行：
 
 ```powershell
-$sourceBootstrap = Join-Path $env:TEMP ("source-" + [Guid]::NewGuid())
-gh repo clone sink6985757-web/cross-device-agent-skills $sourceBootstrap
-& "$sourceBootstrap\source.ps1" -Action bootstrap -ProjectRoot "<專案路徑>" -Yes
+# Windows
+./source.ps1 -Action hub-init -ProjectName "我的工作主幹"
+./source.ps1 -Action child-create -ChildName "第一個專案"
 ```
-
-缺少 Python 時，`-Yes` 允許透過 winget 安裝官方 Python 套件。
-
-### Linux／macOS
 
 ```bash
-source_bootstrap="$(mktemp -d)"
-gh repo clone sink6985757-web/cross-device-agent-skills "$source_bootstrap"
-"$source_bootstrap/source.sh" bootstrap --project-root "<專案路徑>" --yes
+# Linux / macOS
+./source.sh hub-init --project-name "我的工作主幹"
+./source.sh child-create --child-name "第一個專案"
 ```
 
-Linux 支援 apt、dnf、pacman、zypper、apk；macOS 使用 Homebrew。`--yes` 才允許安裝 Python、Git、gh、chezmoi。安裝後會部署五個 managed skills、Agent adapter、Source launchers、authority manifest 與 checkpoint。
-
-## 日常口令
-
-| 意圖 | Windows | Linux／macOS |
-|---|---|---|
-| 自動／續接 | `./source.ps1` | `./source.sh` |
-| 下一步 | `./source.ps1 -Action next` | `./source.sh next` |
-| 檢查 | `./source.ps1 -Action doctor` | `./source.sh doctor` |
-| 收工 | `./source.ps1 -Action finish -CommitMessage "成果" -Yes` | `./source.sh finish --commit-message "成果" --yes` |
-
-## 路徑規則
-
-| 類型 | 規則 |
-|---|---|
-| 專案 canonical JSON | 只能使用專案 root-relative 路徑，例如 `docs/spec.md` |
-| 個人共用核心 | 只能使用 home-relative 表示，例如 `~/.agents/skills` |
-| Runtime | 可解析磁碟機、mount point、`$HOME`、temp、Git／chezmoi 實際位置，但不得回寫 canonical JSON |
-| URL／Page ID | 是外部識別，不是裝置檔案路徑，可以保存 |
-| 禁止 | `C:\Users\...`、`/home/name/...`、`/Users/name/...`、UNC 等裝置綁定路徑 |
-
-`doctor` 會遞迴檢查 config、state、authority；任何持久化絕對路徑都會 `BLOCKED`。跨機資訊只保存 OS 類型，不保存電腦名稱。
-
-## 不可直接修改的權威層
-
-| 類別 | 檔案 | 寫入者 |
-|---|---|---|
-| `PROTECTED` | `SOURCE.md`、`AGENTS.md`、`.source/config.json`、launchers、Git 文字／排除規則 | 僅 formal change |
-| `GENERATED` | `.source/state.json`、`handoff.md`、`.source/runtime/` | 僅 Source engine |
-| `PROJECT_WORK` | authority manifest 未列入的專案工作檔 | 使用者／Agent 依任務修改 |
-| `EXTERNAL_READ_ONLY` | Notion 主 Prompt | 永不修改 |
-
-`PROTECTED` 由 `.source/authority.json`、`.source/authority.sha256` 與 SHA-256 鎖定；支援權限的檔案系統再套用 OS 唯讀。Google Drive 等不保留唯讀 attribute 的虛擬掛載會顯示 `HASH_ENFORCED`，任何未封存變更仍會阻止開工與收工。正式變更流程：
+進入 `projects/第一個專案的-slug/` 後，日常只需要：
 
 ```text
-authority-unlock --yes → 修改核准檔案 → 測試 → authority-seal --yes → doctor
+Source          自動開工或顯示下一步
+Source finish   收工、記錄、Git、技能提案與主幹事件
 ```
 
-任何 signature／hash 不符或 formal change 未封存都不能完成收工；支援實體唯讀但鎖失效時同樣 `BLOCKED`。
+主幹管理者查看及收取全部子專案事件：
 
-## Connector 邊界
+```text
+Source hub-status
+Source hub-sync --yes
+```
 
-- Git／GitHub／Skill／chezmoi：engine 執行並驗證。
-- GDrive：只做 runtime 偵測，不保存實際 mount path。
-- Notion／Obsidian：Agent 回讀成功才回填 `VERIFIED`；Prompt 永遠只讀。
-- CDN：provider／target 未設定時保持 `NOT_CONFIGURED`，不猜測部署位置。
+## 固定架構
+
+```text
+主幹/
+├─ .source/hub/projects/          子專案登錄；每個 project 一檔
+├─ .source/hub/events/            UUID 事件；只新增、不覆寫
+├─ .source/hub/skill-proposals/   子專案收工送回；必須人工審核
+└─ projects/*/                    各自獨立 Git、state、log、lease
+```
+
+- 子專案各自寫 `logs/sessions/<session-id>.json`，收工後再新增一個主幹事件。
+- 主幹 Git 不追蹤 `projects/*/`；子專案不能操作主幹 Git index。只有 `hub-sync` 提交主幹事件，因此不會互搶同一個 index。
+- `.source/coordination/` 由 engine 管理且不進 Git；active lease 表示專案尚未收工，mutation lock 阻擋同一專案同時改寫。
+- Google Drive／Dropbox 類同步服務不是分散式資料庫；同一子專案仍應一次只由一台電腦工作，換機前先收工並等同步完成。需要最強隔離時，各電腦使用獨立 Git clone。
+
+## 技能更新
+
+- 開工只檢查 `.source/config.json` 指定的已核准 private Git remote；authority hash 驗證通過才自動備份並更新 managed skills。
+- 未核准、ChatGPT 建議或子專案新技能不會自動安裝；收工只送入 `skill-proposals/`，審核後才可提升為正式技能。
+- `skills-check` 只檢查，`skills-update` 執行已核准來源更新。沒有通用且可信的「全網最新技能資料庫」，因此不得靜默安裝任意來源。
+
+## 空白 Connector
+
+- Obsidian：初始化時建立專案內 `knowledge/obsidian/Project Log.md`，全程相對路徑。
+- Notion：建立 `NEEDS_SETUP` checkpoint；必須先由使用者授權 connector，再建立或選擇頁面並 `complete`。Prompt 永遠只讀。
+- Google Drive：只偵測 runtime mount；Source 不保存 mount 絕對路徑，也不能代替使用者登入或安裝同步客戶端。
+- CDN：provider 與 target 未明確設定時維持 `NOT_CONFIGURED`，絕不猜測部署。
+
+## 權威與路徑
+
+| 類別 | 寫入規則 |
+|---|---|
+| `PROTECTED` | 只能 `authority-unlock --yes` → 核准修改 → `authority-seal --yes` |
+| `GENERATED` | 只能由 Source engine 寫入 |
+| `PROJECT_WORK` | 專案 Agent 依任務修改 |
+| `EXTERNAL_READ_ONLY` | 永不修改，例如 Notion Prompt |
+
+canonical JSON 只保存專案相對路徑、URL 與外部 ID；Windows drive、UNC、`/home/...`、`/Users/...` 只允許 runtime 使用。每次交接前執行 `doctor`，任何 authority、hash、路徑或事件唯一性錯誤都會標示 `BLOCKED`。
+
+詳細平台安裝見 [platforms.md](source/references/platforms.md)，主幹與競爭模型見 [hub.md](source/references/hub.md)，Notion 空白建置見 [notion-bootstrap.md](source/references/notion-bootstrap.md)。

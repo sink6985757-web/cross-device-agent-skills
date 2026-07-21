@@ -4,29 +4,31 @@
 
 ## 目前做到哪
 
-收工完成，可安全換電腦、OS 或 Agent。
+本地收工完成；等待 connector：obsidian, notion。
 
 ## 狀態
 
-- Phase：READY
-- Revision：20
-- Last action：finish
-- Git：VERIFIED；branch=main；last_push=ce2f752
+- Phase：AWAITING_EXTERNAL
+- Revision：22
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=ce2f752
 
 ## 下一步
 
-1. 下一台電腦執行 Source 即可自動開工。
+1. 完成 obsidian connector，再執行 Source complete。
+2. 完成 notion connector，再執行 Source complete。
 
 ## Connectors
 
 - github：READY
 - skills：VERIFIED
 - gdrive：DETECTED
-- obsidian：VERIFIED
-- notion：VERIFIED
+- obsidian：PENDING_AGENT
+- notion：PENDING_AGENT
 - cdn：NOT_CONFIGURED
+- hub：HUB_READY
 
 ## 最後更新
 
-- 2026-07-21T15:20:32Z
+- 2026-07-21T15:55:04Z
 - Codex @ windows

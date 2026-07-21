@@ -1,8 +1,13 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$Action = 'auto',
     [string]$ProjectRoot = (Get-Location).Path,
     [string]$ProjectName,
+    [string]$WorkspaceRole,
+    [string]$HubRoot,
+    [string]$ChildName,
+    [string]$ChildPath,
+    [int]$LeaseHours = 12,
     [string]$Agent = 'Agent',
     [string]$CommitMessage,
     [string[]]$Include = @(),
@@ -22,7 +27,7 @@ $GlobalEngine = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.agents
 $Engine = if (Test-Path -LiteralPath $LocalEngine) { $LocalEngine } elseif (Test-Path -LiteralPath $GlobalEngine) { $GlobalEngine } else { $null }
 
 if (-not $Engine) {
-    throw 'Source engine 未安裝。先以已登入的 GitHub CLI clone cross-device-agent-skills，再執行該 repo 的 source.ps1 -Action bootstrap -ProjectRoot <專案路徑> -Yes。'
+    throw 'Source engine is not installed. Clone cross-device-agent-skills, then run source.ps1 -Action bootstrap -ProjectRoot <path> -Yes.'
 }
 
 & $Engine @PSBoundParameters

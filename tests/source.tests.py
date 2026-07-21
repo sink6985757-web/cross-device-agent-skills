@@ -18,9 +18,12 @@ ENGINE = REPO / "source" / "scripts" / "source.py"
 
 
 def run(*args: str | Path, cwd: Path | None = None, expect: int = 0) -> subprocess.CompletedProcess[str]:
+    env = dict(os.environ)
+    env["SOURCE_DISABLE_NETWORK"] = "1"
     result = subprocess.run(
         [str(item) for item in args], cwd=str(cwd) if cwd else None,
         text=True, encoding="utf-8", errors="replace", capture_output=True,
+        env=env,
     )
     if result.returncode != expect:
         raise AssertionError(
@@ -104,7 +107,7 @@ def main() -> None:
 
         for canonical in ("config.json", "state.json", "authority.json"):
             text = (root / ".source" / canonical).read_text(encoding="utf-8")
-            assert not re.search(r"(?i)[A-Z]:[\\/]", text)
+            assert not re.search(r"(?i)(?<![A-Za-z0-9+.-])[A-Z]:[\\/]", text)
             assert not re.search(r"/(?:home|Users)/[^\s\"]+", text)
 
         print("PASS: init -> lock -> start -> interrupted resume -> finish -> connector -> path scrub -> unlock/seal")

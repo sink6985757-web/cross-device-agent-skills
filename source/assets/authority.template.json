@@ -13,7 +13,10 @@
   "generated": [
     {"path": ".source/state.json", "writer": "source-engine-only", "reason": "resumable checkpoint; never hand edit"},
     {"path": "handoff.md", "writer": "source-engine-only", "reason": "human-readable projection of state"},
-    {"path": ".source/runtime/", "writer": "source-engine-only", "reason": "device-local formal-change marker; never commit"}
+    {"path": ".source/runtime/", "writer": "source-engine-only", "reason": "device-local formal-change marker; never commit"},
+    {"path": ".source/coordination/", "writer": "source-engine-only", "reason": "cloud-synced leases; never commit or hand edit"},
+    {"path": ".source/hub/", "writer": "source-engine-only", "reason": "append-only child descriptors, events, and skill proposals"},
+    {"path": "logs/sessions/", "writer": "source-engine-only", "reason": "project-local resumable session logs"}
   ],
   "external_read_only": [
     {"config_pointer": "connectors.notion.prompt", "writer": "never", "reason": "Notion Prompt is read-only"}

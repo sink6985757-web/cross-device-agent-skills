@@ -1,8 +1,13 @@
-﻿[CmdletBinding()]
+[CmdletBinding()]
 param(
     [string]$Action = 'auto',
     [string]$ProjectRoot = (Get-Location).Path,
     [string]$ProjectName,
+    [string]$WorkspaceRole,
+    [string]$HubRoot,
+    [string]$ChildName,
+    [string]$ChildPath,
+    [int]$LeaseHours = 12,
     [string]$Agent = 'Agent',
     [string]$CommitMessage,
     [string[]]$Include = @(),
@@ -62,11 +67,14 @@ if (-not $Python) {
 $Arguments = @($Python.Prefix) + @($PythonEngine, '--action', $Action, '--project-root', $ProjectRoot, '--agent', $Agent)
 foreach ($pair in @(
     @('--project-name',$ProjectName), @('--commit-message',$CommitMessage),
+    @('--workspace-role',$WorkspaceRole), @('--hub-root',$HubRoot),
+    @('--child-name',$ChildName), @('--child-path',$ChildPath),
     @('--connector',$Connector), @('--connector-status',$ConnectorStatus),
     @('--external-id',$ExternalId), @('--note',$Note)
 )) {
     if ($pair[1]) { $Arguments += $pair }
 }
+$Arguments += @('--lease-hours', $LeaseHours)
 foreach ($path in $Include) { $Arguments += @('--include', $path) }
 if ($Yes) { $Arguments += '--yes' }
 if ($DryRun) { $Arguments += '--dry-run' }
