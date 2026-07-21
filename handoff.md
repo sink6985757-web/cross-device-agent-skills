@@ -33,5 +33,5 @@
 
 - 時間：2026-07-21 20:58
 - 更新者：Hermes @ DESKTOP-P5NQS9D
-- Git push：待推
-- Notion：待同步
+- Git push：✅ 已推（cross-device-agent-skills main）
+- Notion：`00_system｜未執行（Knowledge Master 不可讀，待回有 Notion connector 的電腦處理）`
