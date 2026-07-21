@@ -1,0 +1,60 @@
+{
+    "schema_version":  1,
+    "project_id":  "64851505-857c-4dd4-a9f1-064d82331b43",
+    "project_name":  "Source project pipeline",
+    "phase":  "AWAITING_EXTERNAL",
+    "revision":  3,
+    "session_id":  null,
+    "summary":  "本地收工完成；等待 connector：obsidian, notion。",
+    "last_action":  "finish-preflight",
+    "updated_at":  "2026-07-21T14:32:24Z",
+    "actor":  {
+                  "agent":  "Codex",
+                  "device":  "YULIN-SFG16-72"
+              },
+    "next_steps":  [
+                       "完成 obsidian connector，再執行 source.ps1 -Action complete -Connector obsidian -ConnectorStatus VERIFIED。",
+                       "完成 notion connector，再執行 source.ps1 -Action complete -Connector notion -ConnectorStatus VERIFIED。"
+                   ],
+    "git":  {
+                "enabled":  true,
+                "status":  "DIRTY",
+                "branch":  "main",
+                "remote":  "https://github.com/sink6985757-web/cross-device-agent-skills.git",
+                "ahead":  0,
+                "behind":  0,
+                "last_push":  null
+            },
+    "connectors":  {
+                       "github":  {
+                                      "status":  "READY",
+                                      "external_id":  null,
+                                      "note":  null
+                                  },
+                       "skills":  {
+                                      "status":  "VERIFIED",
+                                      "external_id":  null,
+                                      "note":  "✓ Set skills.external_dirs = ~/.agents/skills in C:\\Users\\Yulin\\AppData\\Local\\hermes\\config.yaml; source=INSTALLED; project-init=MATCH; startup=MATCH; shutdown=MATCH"
+                                  },
+                       "gdrive":  {
+                                      "status":  "RUNTIME",
+                                      "external_id":  null,
+                                      "note":  null
+                                  },
+                       "obsidian":  {
+                                        "status":  "PENDING_AGENT",
+                                        "external_id":  null,
+                                        "note":  null
+                                    },
+                       "notion":  {
+                                      "status":  "PENDING_AGENT",
+                                      "external_id":  null,
+                                      "note":  null
+                                  },
+                       "cdn":  {
+                                   "status":  "NOT_CONFIGURED",
+                                   "external_id":  null,
+                                   "note":  null
+                               }
+                   }
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "project_name": "Source project pipeline",
+  "project_kind": "skill-distribution",
+  "default_branch": "main",
+  "git": {
+    "private_by_default": true,
+    "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
+    "include_paths": [
+      ".source",
+      "SOURCE.md",
+      "AGENTS.md",
+      "handoff.md",
+      "README.md",
+      "source.ps1",
+      ".gitattributes",
+      ".gitignore",
+      "source",
+      "project-init",
+      "startup",
+      "shutdown",
+      "tests"
+    ]
+  },
+  "skills": {
+    "managed": ["source", "project-init", "startup", "shutdown"],
+    "sync_dotfiles": true
+  },
+  "connectors": {
+    "gdrive": {
+      "enabled": true,
+      "mode": "RUNTIME_DETECT"
+    },
+    "obsidian": {
+      "enabled": true,
+      "mode": "AGENT",
+      "relative_note": "cross-device-agent-skills-master/專案工作流程.md"
+    },
+    "notion": {
+      "enabled": true,
+      "mode": "AGENT",
+      "knowledge_master": "https://app.notion.com/p/6474dc5067fa49a98a339275ab8a8539",
+      "topic": "00_system",
+      "prompt": "https://app.notion.com/p/39c367cc4e4c8170a8c0fb2d9581f7be",
+      "period_page": "https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370"
+    },
+    "cdn": {
+      "enabled": false,
+      "mode": "AGENT",
+      "provider": null,
+      "target": null
+    }
+  }
+}
