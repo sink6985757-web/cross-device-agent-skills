@@ -3,21 +3,21 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 30,
-  "session_id": null,
-  "summary": "全部收工 connector 已完成。",
-  "last_action": "complete-notion",
-  "updated_at": "2026-07-21T16:25:10Z",
+  "revision": 33,
+  "session_id": "ba6fbff2-555d-4e27-a6fe-6e2508d2aac5",
+  "summary": "收工完成，可安全換電腦、OS 或 Agent。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T16:28:32Z",
   "actor": {
     "agent": "Agent",
     "platform": "windows"
   },
   "next_steps": [
-    "下一台電腦執行 Source 即可自動開工。"
+    "Command failed (~/AppData\\Local\\Microsoft\\WinGet\\Packages\\twpayne.chezmoi_Microsoft.Winget.Source_8wekyb3d8bbwe\\chezmoi.exe): chezmoi: ~/.codex\\AGENTS.md: not managed"
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "DIRTY",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -31,9 +31,9 @@
       "note": null
     },
     "skills": {
-      "status": "VERIFIED",
+      "status": "BLOCKED",
       "external_id": "515618904e2b9dd2c9b7129ba5797b04c6ea0997",
-      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
+      "note": "Command failed (~/AppData\\Local\\Microsoft\\WinGet\\Packages\\twpayne.chezmoi_Microsoft.Winget.Source_8wekyb3d8bbwe\\chezmoi.exe): chezmoi: ~/.codex\\AGENTS.md: not managed"
     },
     "gdrive": {
       "status": "DETECTED",
@@ -47,7 +47,7 @@
     },
     "notion": {
       "status": "VERIFIED",
-      "external_id": "3a4367cc4e4c81239ac3d61ce049d370",
+      "external_id": "https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370",
       "note": null
     },
     "cdn": {

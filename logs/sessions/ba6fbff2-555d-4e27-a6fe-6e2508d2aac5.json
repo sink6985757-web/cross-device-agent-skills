@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
+  "project_name": "Source project pipeline",
+  "session_id": "ba6fbff2-555d-4e27-a6fe-6e2508d2aac5",
+  "started_at": "2026-07-21T16:27:10Z",
+  "events": [
+    {
+      "event": "finish",
+      "at": "2026-07-21T16:28:32Z",
+      "agent": "Agent"
+    }
+  ],
+  "status": "FINISHED",
+  "finished_at": "2026-07-21T16:28:32Z",
+  "summary": "收工完成，可安全換電腦、OS 或 Agent。"
+}
