@@ -187,7 +187,7 @@ function Install-ManagedSkills {
     $userRoot = [Environment]::GetFolderPath('UserProfile')
     $destinationRoot = Join-Path $userRoot '.agents\skills'
     $backupRoot = Join-Path $userRoot ('.agents\skill-backups\source-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
-    $managed = @('source','project-init','startup','shutdown')
+    $managed = @('source','project-init','startup','shutdown','notion-conversation-log')
     $results = @()
     if (-not $DryRun) { New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null }
     foreach ($name in $managed) {
@@ -252,7 +252,7 @@ function Sync-Dotfiles {
     ) | Where-Object { Test-Path -LiteralPath $_ }
     $sourcePath = (& $command source-path).Trim()
     if (-not $DryRun) {
-        foreach ($name in @('source','project-init','startup','shutdown')) {
+        foreach ($name in @('source','project-init','startup','shutdown','notion-conversation-log')) {
             $liveSkill = Join-Path $userRoot ".agents\skills\$name"
             $sourceManifest = Join-Path $sourcePath "dot_agents\skills\$name\SKILL.md"
             if ((Test-Path -LiteralPath $liveSkill) -and (-not (Test-Path -LiteralPath $sourceManifest))) {
@@ -378,7 +378,7 @@ function New-ProjectConfig {
         project_kind = 'standard'
         default_branch = if ($snapshot.branch) { $snapshot.branch } else { 'main' }
         git = [ordered]@{ private_by_default=$true; remote=$snapshot.remote; include_paths=@('.source','SOURCE.md','AGENTS.md','handoff.md','source.ps1','.gitattributes') }
-        skills = [ordered]@{ managed=@('source','project-init','startup','shutdown'); sync_dotfiles=$true }
+        skills = [ordered]@{ managed=@('source','project-init','startup','shutdown','notion-conversation-log'); sync_dotfiles=$true }
         connectors = [ordered]@{
             gdrive = [ordered]@{ enabled=$true; mode='RUNTIME_DETECT' }
             obsidian = [ordered]@{ enabled=$false; mode='AGENT'; relative_note=$null }

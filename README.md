@@ -26,8 +26,8 @@ SOURCE.md                 單一人類／Agent 入口
 source.ps1                單一命令入口
 .source/                  可恢復 config 與 state
 source/                   正式 Skill、腳本、connector 規則、模板
-project-init|startup|shutdown/
-                          舊口令的薄轉接
+project-init|startup|shutdown|notion-conversation-log/
+                          舊口令與 Notion Log 的薄轉接
 tests/                    拋棄式端到端驗證
 ```
 

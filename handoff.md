@@ -4,18 +4,18 @@
 
 ## 目前做到哪
 
-尚待 connector：notion。
+本地收工完成；等待 connector：notion。
 
 ## 狀態
 
 - Phase：AWAITING_EXTERNAL
-- Revision：5
-- Last action：complete-obsidian
-- Git：VERIFIED；branch=main；last_push=4e8a6a3
+- Revision：7
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=4e8a6a3
 
 ## 下一步
 
-1. 完成 notion connector。
+1. 下次執行 `./source.ps1` 自動開工。
 
 ## Connectors
 
@@ -28,5 +28,5 @@
 
 ## 最後更新
 
-- 2026-07-21T14:33:23Z
-- Codex @ YULIN-SFG16-72
+- 2026-07-21T14:38:15Z
+- Agent @ YULIN-SFG16-72

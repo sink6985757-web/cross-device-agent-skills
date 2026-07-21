@@ -38,7 +38,7 @@ gh repo clone sink6985757-web/cross-device-agent-skills $sourceBootstrap
 | 「收工」 | `./source.ps1 -Action finish -CommitMessage "具體成果"` |
 | 「檢查」 | `./source.ps1 -Action doctor` |
 
-`project-init`、`startup`、`shutdown` 仍可觸發，但都只轉接到同一個 `source` 狀態機。
+`project-init`、`startup`、`shutdown` 仍可觸發，但都只轉接到同一個 `source` 狀態機；`notion-conversation-log` 也只轉接到同一個 Notion checkpoint，不再建立重複 Log。
 
 ## Canonical state
 

@@ -19,11 +19,12 @@
       "project-init",
       "startup",
       "shutdown",
+      "notion-conversation-log",
       "tests"
     ]
   },
   "skills": {
-    "managed": ["source", "project-init", "startup", "shutdown"],
+    "managed": ["source", "project-init", "startup", "shutdown", "notion-conversation-log"],
     "sync_dotfiles": true
   },
   "connectors": {
