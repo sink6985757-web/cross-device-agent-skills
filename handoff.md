@@ -4,18 +4,18 @@
 
 ## 目前做到哪
 
-全部收工 connector 已完成。
+本地可繼續；connector 未完整：obsidian=BLOCKED。
 
 ## 狀態
 
 - Phase：READY
-- Revision：39
-- Last action：complete-notion
-- Git：VERIFIED；branch=main；last_push=ee1e24f
+- Revision：41
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=ee1e24f
 
 ## 下一步
 
-1. 下一台電腦執行 Source 即可自動開工。
+1. 處理 obsidian connector（BLOCKED）後重新回填 checkpoint。
 
 ## Connectors
 
@@ -29,5 +29,5 @@
 
 ## 最後更新
 
-- 2026-07-21T23:04:37Z
+- 2026-07-21T23:22:10Z
 - Codex @ windows

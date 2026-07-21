@@ -1264,6 +1264,31 @@ def pending_connectors(state: dict[str, Any]) -> list[str]:
     return [name for name, value in state["connectors"].items() if value["status"] == "PENDING_AGENT"]
 
 
+def incomplete_connectors(state: dict[str, Any]) -> list[tuple[str, str]]:
+    incomplete_statuses = {"BLOCKED", "PARTIAL", "NEEDS_SETUP", "READY_AGENT", "SKIPPED"}
+    return [
+        (name, value["status"])
+        for name, value in state["connectors"].items()
+        if value["status"] in incomplete_statuses
+    ]
+
+
+def connector_rollup(state: dict[str, Any], *, success_summary: str) -> tuple[str, str, list[str]]:
+    pending = pending_connectors(state)
+    incomplete = incomplete_connectors(state)
+    incomplete_text = ", ".join(f"{name}={status}" for name, status in incomplete)
+    steps = [f"完成 {name} connector，再執行 Source complete。" for name in pending]
+    steps.extend(f"處理 {name} connector（{status}）後重新回填 checkpoint。" for name, status in incomplete)
+    if pending:
+        summary = f"尚待 connector：{', '.join(pending)}。"
+        if incomplete_text:
+            summary += f" 已知未完整：{incomplete_text}。"
+        return "AWAITING_EXTERNAL", summary, steps
+    if incomplete:
+        return "READY", f"本地可繼續；connector 未完整：{incomplete_text}。", steps
+    return "READY", success_summary, ["下一台電腦執行 Source 即可自動開工。"]
+
+
 def finish_project(root: Path, args: argparse.Namespace) -> None:
     ensure_authority(root)
     config = read_json(config_path(root))
@@ -1295,15 +1320,14 @@ def finish_project(root: Path, args: argparse.Namespace) -> None:
             for name in ("obsidian", "notion", "cdn"):
                 if config["connectors"][name]["enabled"]:
                     state["connectors"][name]["status"] = "PENDING_AGENT"
-                    steps.append(f"完成 {name} connector，再執行 Source complete。")
                 elif name == "cdn":
                     state["connectors"]["cdn"]["status"] = "NOT_CONFIGURED"
-        pending = pending_connectors(state)
-        final_phase = "AWAITING_EXTERNAL" if pending else "READY"
-        state["phase"] = final_phase
-        state["summary"] = f"本地收工完成；等待 connector：{', '.join(pending)}。" if pending else "收工完成，可安全換電腦、OS 或 Agent。"
-        if not steps:
-            steps = [f"完成 {name} connector。" for name in pending] if pending else ["下一台電腦執行 Source 即可自動開工。"]
+        state["phase"], state["summary"], connector_steps = connector_rollup(
+            state, success_summary="收工完成，可安全換電腦、OS 或 Agent。",
+        )
+        for step in connector_steps:
+            if step not in steps:
+                steps.append(step)
         update_git_state(root, state)
         log_path = update_session_log(root, config, state, session_id, "finish", summary=state["summary"])
         proposals = publish_skill_proposals(root, config, state, session_id)
@@ -1341,10 +1365,9 @@ def complete_connector(root: Path, args: argparse.Namespace) -> None:
     state["connectors"][args.connector].update(
         status=args.connector_status, external_id=args.external_id, note=args.note,
     )
-    pending = pending_connectors(state)
-    state["phase"] = "AWAITING_EXTERNAL" if pending else "READY"
-    state["summary"] = f"尚待 connector：{', '.join(pending)}。" if pending else "全部收工 connector 已完成。"
-    steps = [f"完成 {name} connector。" for name in pending] if pending else ["下一台電腦執行 Source 即可自動開工。"]
+    state["phase"], state["summary"], steps = connector_rollup(
+        state, success_summary="全部已啟用 connector 均完成或可用。",
+    )
     save_checkpoint(root, state, action=f"complete-{args.connector}", next_steps=steps, agent=args.agent)
     if not args.skip_git:
         git_finish(root, f"回填 {args.connector} connector 狀態", [], args.dry_run)

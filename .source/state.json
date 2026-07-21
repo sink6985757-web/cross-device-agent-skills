@@ -3,21 +3,21 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 39,
-  "session_id": null,
-  "summary": "全部收工 connector 已完成。",
-  "last_action": "complete-notion",
-  "updated_at": "2026-07-21T23:04:37Z",
+  "revision": 41,
+  "session_id": "7661cdfc-72aa-4238-972d-5ce387e011dc",
+  "summary": "本地可繼續；connector 未完整：obsidian=BLOCKED。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T23:22:10Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "下一台電腦執行 Source 即可自動開工。"
+    "處理 obsidian connector（BLOCKED）後重新回填 checkpoint。"
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "DIRTY",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -32,8 +32,8 @@
     },
     "skills": {
       "status": "VERIFIED",
-      "external_id": "515618904e2b9dd2c9b7129ba5797b04c6ea0997",
-      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
+      "external_id": "e8c5eea580d27906433081f631abd54d9841019d",
+      "note": "source=INSTALLED; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
     },
     "gdrive": {
       "status": "DETECTED",

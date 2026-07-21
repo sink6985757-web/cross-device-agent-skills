@@ -98,6 +98,19 @@ def main() -> None:
         assert int(run("git", "-C", root, "rev-list", "--count", "HEAD").stdout) == 3
         assert source(root, "doctor").returncode == 0
 
+        source(
+            root, "complete", "--connector", "obsidian", "--connector-status", "BLOCKED",
+            "--note", "vault-relative note is unavailable",
+        )
+        degraded = load(root / ".source" / "state.json")
+        assert degraded["phase"] == "READY"
+        assert degraded["connectors"]["obsidian"]["status"] == "BLOCKED"
+        assert "全部" not in degraded["summary"]
+        assert "obsidian=BLOCKED" in degraded["summary"]
+        assert any("obsidian" in step for step in degraded["next_steps"])
+        assert not run("git", "-C", root, "status", "--porcelain").stdout.strip()
+        assert int(run("git", "-C", root, "rev-list", "--count", "HEAD").stdout) == 4
+
         source(root, "authority-unlock", "--yes")
         with (root / "SOURCE.md").open("a", encoding="utf-8", newline="\n") as handle:
             handle.write("FORMAL CHANGE\n")
@@ -110,7 +123,7 @@ def main() -> None:
             assert not re.search(r"(?i)(?<![A-Za-z0-9+.-])[A-Z]:[\\/]", text)
             assert not re.search(r"/(?:home|Users)/[^\s\"]+", text)
 
-        print("PASS: init -> lock -> start -> interrupted resume -> finish -> connector -> path scrub -> unlock/seal")
+        print("PASS: init -> lock -> start -> interrupted resume -> finish -> connector rollup -> path scrub -> unlock/seal")
     finally:
         def remove_error(function, path, _exc):
             os.chmod(path, 0o700)

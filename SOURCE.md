@@ -7,6 +7,8 @@ Windows       ./source.ps1
 Linux/macOS   ./source.sh
 ```
 
+對人仍使用三個口令：「初始化專案」→ `init`、「開工」→ `start`、「收工」→ `finish`；`project-init`、`startup`、`shutdown` 只是相容入口，不各自保存另一份 SOP。
+
 無參數會自動判斷：未初始化就建立、`READY` 就開工、工作中或等待外部服務就顯示唯一下一步。不得手改 `.source/state.json`、`handoff.md` 或權威檔。
 
 ## 全新環境
@@ -66,6 +68,7 @@ Source hub-sync --yes
 - Notion：建立 `NEEDS_SETUP` checkpoint；必須先由使用者授權 connector，再建立或選擇頁面並 `complete`。Prompt 永遠只讀。
 - Google Drive：只偵測 runtime mount；Source 不保存 mount 絕對路徑，也不能代替使用者登入或安裝同步客戶端。
 - CDN：provider 與 target 未明確設定時維持 `NOT_CONFIGURED`，絕不猜測部署。
+- `PENDING_AGENT` 會停在 `AWAITING_EXTERNAL`；`BLOCKED`／`PARTIAL` 可保留本地 `READY`，但 summary 與下一步必須列出未完整項目，不得顯示「全部完成」。
 
 ## 權威與路徑
 

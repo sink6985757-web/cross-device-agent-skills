@@ -7,7 +7,7 @@
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "single human and agent entry contract",
-      "sha256": "d0d77384709d9e6f02434600041d0a0b4a0f6a9e6a873f0b4c6761df90ceaab5"
+      "sha256": "a08cf32b915109a7c00274e4cd18ef2e5bad474f8fad8b2ee4c130cd8d4d8340"
     },
     {
       "path": "AGENTS.md",
@@ -21,7 +21,7 @@
       "kind": "file",
       "writer": "formal-change-only",
       "reason": "public project overview",
-      "sha256": "4862d0cf6e85dd020e133f30c5526c93fcced3d049fccd33f598943439eb3907"
+      "sha256": "7ebacf5f7982d6cd38e824b81ead84353962945a6ff2d46b723437c16d3ea9b7"
     },
     {
       "path": ".source/config.json",
@@ -63,7 +63,7 @@
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "canonical skill and cross-platform engine",
-      "sha256": "f54c0e565ae04e74c9dd5cb6f322c079c62f383825f6dd823eabbe2173da1630"
+      "sha256": "1cbcb397d41530596bd13baaae2a685b54e82f22fd1b17e6526131556124285d"
     },
     {
       "path": "project-init",
@@ -98,7 +98,7 @@
       "kind": "tree",
       "writer": "formal-change-only",
       "reason": "validation contract",
-      "sha256": "eb57a586a1df0b8eab0564d290da4da5dc5f9779018c57d488d33029c5f7f3da"
+      "sha256": "67830955ab4ee8e54bcec9bce05b8993165215c715e12dfc1a1039f8544a99ff"
     },
     {
       "path": ".github",
@@ -147,6 +147,6 @@
       "reason": "Notion Prompt is read-only"
     }
   ],
-  "sealed_at": "2026-07-21T15:54:18Z",
+  "sealed_at": "2026-07-21T23:21:39Z",
   "sealed_by": "Codex"
 }

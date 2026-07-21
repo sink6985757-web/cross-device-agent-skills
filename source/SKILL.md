@@ -39,4 +39,5 @@ Linux/macOS:  ./source.sh doctor
 - 只自動更新 config 指定且通過 authority 驗證的技能 remote；其他技能只能提出待審 proposal。
 - private repo 與明確認證為預設；不保存 token、cookie、credential 或裝置絕對路徑。
 - Prompt 頁永遠只讀；Notion 同主題同週只更新原 Page ID。
+- Connector 為 `BLOCKED`／`PARTIAL` 時可讓本地工作維持 `READY`，但 summary 與下一步必須保留未完整狀態，不得宣告全部完成。
 - 不覆寫既有專案檔；缺工具或權限時保存 checkpoint 與唯一下一步。

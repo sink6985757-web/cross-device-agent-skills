@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
+  "project_name": "Source project pipeline",
+  "session_id": "7661cdfc-72aa-4238-972d-5ce387e011dc",
+  "started_at": "2026-07-21T23:16:26Z",
+  "events": [
+    {
+      "event": "start",
+      "at": "2026-07-21T23:16:26Z",
+      "agent": "Codex"
+    },
+    {
+      "event": "finish",
+      "at": "2026-07-21T23:22:10Z",
+      "agent": "Codex"
+    }
+  ],
+  "status": "FINISHED",
+  "finished_at": "2026-07-21T23:22:10Z",
+  "summary": "本地可繼續；connector 未完整：obsidian=BLOCKED。"
+}

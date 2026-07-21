@@ -1,14 +1,27 @@
 # Project Log
 
-> 這是 Source 建立的專案本地知識入口；可由 Obsidian 直接開啟。工作 session 的 canonical 紀錄位於 `logs/sessions/`，本頁只放給人閱讀的摘要與連結。
+> Obsidian 保存給人閱讀的完整脈絡；canonical checkpoint 仍是 `.source/state.json`，本頁不取代 Source，也不保存 secret 或裝置絕對路徑。
 
-## 專案狀態
+## ⏯️ 上次做到哪
 
-- 下一步：執行 Source。
-- 最近收工：尚無。
+- 尚未開始；執行 Source 取得唯一下一步。
 
-## 規則
+## 決策紀錄
 
-- 不保存 token、cookie、credential 或裝置絕對路徑。
-- 不手改 `.source/state.json`、`handoff.md` 或權威檔。
-- 跨電腦時先等雲端同步完成，再執行 Source。
+- 只記錄「做了什麼取捨、為什麼」，不要複製整份 handoff。
+
+## 素材與連結
+
+- 專案入口：`README.md`
+- Agent 入口：`AGENTS.md`
+
+## 🕳️ 踩坑筆記
+
+- Google Drive 不是強一致鎖；換機前先收工並等待同步。
+- `.source/state.json`、`handoff.md` 與 PROTECTED 檔不得手改。
+
+## 🗓️ 最近更動紀錄
+
+| 日期 | 摘要 | Connector 狀態 |
+|---|---|---|
+| YYYY-MM-DD | Source 初始化 | 待首次回讀 |
