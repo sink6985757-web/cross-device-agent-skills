@@ -1,10 +1,10 @@
-# 跨電腦專案管理三技能（專案藍圖）
+# 跨電腦專案管理三技能 × 四層級（專案藍圖）
 
 > 本檔為跨 Agent 通用的專案藍圖（AGENTS.md 開放標準）。任何 Agent 的每個 session 都應先讀本檔＋`handoff.md`。
 
 ## 專案簡介
 
-本專案提供 `project-init`、`startup`、`shutdown` 三個技能，目標是讓同一個專案能在不同電腦與 AI Agent 之間透過精簡藍圖、交接檔、GitHub 備份及 Obsidian 詳細筆記無縫接續。
+本專案提供 `project-init`、`startup`、`shutdown` 三個技能，目標是讓同一個專案能在不同電腦與 AI Agent 之間透過精簡藍圖、交接檔、GitHub 備份、Obsidian 詳細筆記及 Notion Knowledge Master 正式治理無縫接續。
 
 ## 關鍵時程
 
@@ -14,6 +14,9 @@
 - [x] 建立本地專案藍圖與交接機制
 - [x] 建立 Obsidian 專案工作流程筆記
 - [x] 完成 GitHub 私有 repository 與初始推送
+- [x] 將 Notion Knowledge Master 與主 Prompt 規則整合為 L4
+- [x] 建立 chezmoi 管理的跨 Agent 共用 Skill 主庫與私有 dotfiles 備份
+- [x] 將 L4 權威入口名稱統一為 Knowledge Master
 - [ ] 在不同電腦與 Agent 上進行實際接續驗證
 
 ## 資料夾結構
@@ -33,13 +36,25 @@ cross-device-agent-skills-master/
    └─ SKILL.md                   # 收工技能
 ```
 
-## 同步層級（本專案初始化至第 3 層級）
+## 同步層級（本專案初始化至第 4 層級）
 
 | 層級 | 平台 | 位置 | 讀取時機 |
 |------|------|------|---------|
 | L1 | 本地（GDrive） | `agents.md`＋`handoff.md` | 每個 session |
 | L2 | GitHub | `sink6985757-web/cross-device-agent-skills`（private） | 指定時 |
 | L3 | Obsidian | `cross-device-agent-skills-master/專案工作流程.md` | 有需要時 |
+| L4 | Notion | `Knowledge Master／00_system／2026-W30｜00_system` | 先讀規則；成果依 ACTION 寫回 |
+
+共用 Agent 核心由 `sink6985757-web/dotfiles`（private）管理；全域規則唯一正式來源為 `~/.agents/GLOBAL.md`，使用者自建 Skill 唯一正式來源為 `~/.agents/skills`。
+
+## Notion L4 治理
+
+- Knowledge Master：[權威入口](https://app.notion.com/p/6474dc5067fa49a98a339275ab8a8539)
+- 唯一正式主題：[00_system](https://app.notion.com/p/3a0367cc4e4c81b38a56edeb23f3da96)
+- 主 Prompt：[Prompt｜00_system](https://app.notion.com/p/39c367cc4e4c8170a8c0fb2d9581f7be)（只讀）
+- 本週唯一紀錄：[2026-W30｜00_system](https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370)
+- 寫入規則：明確 `READ_ONLY` 才不寫；否則完成可重用成果後 `AUTO_SAVE`，同事件、同期間、同主題更新原 Page ID
+- 狀態標示：`VERIFIED`｜`PARTIAL`｜`BLOCKED`
 
 ## 工作約定
 
@@ -47,3 +62,4 @@ cross-device-agent-skills-master/
 - 修改共用檔案前先讀最新內容，避免覆蓋其他 Agent 的變更
 - 所有回應與文件使用繁體中文
 - 修改前先確認計畫，優先保留原有資料結構
+- L4 操作先讀 Knowledge Master 共用公約與正式主題 Prompt；Prompt 頁只讀，不建立同週重複紀錄

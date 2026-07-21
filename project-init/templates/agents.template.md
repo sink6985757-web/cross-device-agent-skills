@@ -23,10 +23,19 @@
 | L1 | 本地（GDrive） | `agents.md`＋`handoff.md` | 每個 session |
 | L2 | GitHub | <未啟用｜<你的GitHub帳號>/repo-name> | 指定時 |
 | L3 | Obsidian | <未啟用｜資料夾名/專案工作流程.md> | 有需要時 |
+| L4 | Notion | <未啟用｜Knowledge Master／正式主題／週期頁> | 先讀規則；成果依 ACTION 寫回 |
+
+## Notion L4 治理
+
+- Knowledge Master：<未啟用｜https://app.notion.com/p/6474dc5067fa49a98a339275ab8a8539>
+- 唯一正式主題：<未判定｜主題名稱與 Page ID／URL>
+- 主 Prompt：<未判定｜Prompt｜主題 Page ID／URL；只讀>
+- 寫入規則：明確 `READ_ONLY` 才不寫；否則完成可重用成果後 `AUTO_SAVE`，同事件、同期間、同主題更新原 Page ID
+- 狀態標示：`VERIFIED`｜`PARTIAL`｜`BLOCKED`
 
 ## 工作約定
 - 任何 Agent、任何電腦：**開工先讀 `handoff.md`，收工必更新 `handoff.md`**
 - 修改共用檔案前先讀最新內容，避免覆蓋其他 Agent 的變更
 - 所有回應與文件使用繁體中文
 - 修改前先確認計畫，優先保留原有資料結構
-
+- L4 操作先讀 Knowledge Master 共用公約與正式主題 Prompt；Prompt 頁只讀，不建立同週重複紀錄
