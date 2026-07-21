@@ -1,34 +1,25 @@
 # Source project pipeline
 
-跨電腦、跨 Agent 的單一入口專案生命週期。
-
-```powershell
-./source.ps1
-```
-
-完整入口、安裝與安全邊界請讀 [SOURCE.md](SOURCE.md)。
-
-## 四個口令，一個狀態機
-
-| 口令 | 功能 |
-|---|---|
-| `source` | 自動初始化、開工或從 checkpoint 續接 |
-| `初始化` | 建立最小專案核心與私有 Git 準備 |
-| `開工` | 讀取狀態、遠端差異與唯一下一步 |
-| `收工` | 保存交接、push、部署 Skill，等待外部 connector |
-
-三個舊 Skill 已縮成相容轉接；正式邏輯只在 `source/scripts/source.ps1`。
-
-## 結構
+Windows、Linux、macOS 共用一套 Python 標準庫狀態機；PowerShell 與 POSIX shell 只是薄 adapter。
 
 ```text
-SOURCE.md                 單一人類／Agent 入口
-source.ps1                單一命令入口
-.source/                  可恢復 config 與 state
-source/                   正式 Skill、腳本、connector 規則、模板
-project-init|startup|shutdown|notion-conversation-log/
-                          舊口令與 Notion Log 的薄轉接
-tests/                    拋棄式端到端驗證
+Windows       ./source.ps1
+Linux/macOS   ./source.sh
 ```
 
-GitHub repo 維持 private。Notion Prompt 只讀；CDN 未配置 provider／target 前不部署。
+完整安裝、路徑政策、不可修改檔案與正式變更閘門請讀 [SOURCE.md](SOURCE.md)。
+
+## 核心結構
+
+```text
+SOURCE.md                         唯一人類／Agent 入口（PROTECTED）
+source.ps1 | source.sh            OS adapter（PROTECTED）
+source/scripts/source.py          唯一跨平台 engine
+.source/config.json               root-relative canonical config（PROTECTED）
+.source/authority.*               signature、hash 與寫入權限契約
+.source/state.json | handoff.md   engine-only checkpoint（GENERATED）
+source/                           正式 Skill、scripts、references、assets
+tests/                            Windows／Linux／macOS 端到端驗證
+```
+
+五個 managed skills 共用同一狀態機；GitHub repository 維持 private。Notion Prompt 只讀，CDN 未配置 provider／target 前不部署。

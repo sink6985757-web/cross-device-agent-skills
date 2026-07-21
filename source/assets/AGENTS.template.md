@@ -1,7 +1,6 @@
-# Agent entry
+# Agent entry — PROTECTED
 
-1. 先讀 `SOURCE.md`。
-2. 執行 `./source.ps1 -Action next`，依唯一下一步續接。
-3. 修改前讀最新檔案；只處理任務範圍。
-4. 結束時執行 `./source.ps1 -Action finish`。
-5. 不手工修改 `.source/state.json`，不提交 secret 或 credentials。
+1. 先執行 Source `next`：Windows 使用 `./source.ps1`，Linux／macOS 使用 `./source.sh`。
+2. 不直接修改本檔、`SOURCE.md` 或 `.source/config.json`；正式變更走 authority gate。
+3. `.source/state.json` 與 `handoff.md` 是 GENERATED，只能由 engine 寫入。
+4. 不保存 secret、credential 或裝置絕對路徑；結束時執行 Source `finish`。

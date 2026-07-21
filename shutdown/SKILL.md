@@ -6,6 +6,6 @@ description: Source pipeline 的收工相容入口。當使用者說收工、結
 # Shutdown
 
 1. 讀取 `../source/SKILL.md`。
-2. 檢查變更與 commit 訊息後執行 `./source.ps1 -Action finish -CommitMessage <具體成果>`。
+2. 檢查 authority gate、變更與 commit 訊息後，以目前 OS 的 Source adapter 執行 `finish`。
 3. 若輸出 `PENDING_AGENT`，只讀 `../source/references/connectors.md` 並完成指定 connector。
-4. 每完成一個 connector 就用 `source.ps1 -Action complete` 回填；不得假裝成功。
+4. 每完成一個 connector 就用 Source `complete` 回填；不得假裝成功。

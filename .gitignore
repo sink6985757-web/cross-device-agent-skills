@@ -7,3 +7,6 @@ credentials.*
 .env.*
 *.pem
 .source/backups/
+.source/runtime/
+__pycache__/
+*.pyc

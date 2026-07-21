@@ -19,8 +19,7 @@
 
 ## 完成 checkpoint
 
-```powershell
-./source.ps1 -Action complete -Connector notion -ConnectorStatus VERIFIED -ExternalId "page-id"
-./source.ps1 -Action complete -Connector obsidian -ConnectorStatus VERIFIED
-./source.ps1 -Action complete -Connector cdn -ConnectorStatus BLOCKED -Note "缺少部署 target"
+```text
+Windows:      ./source.ps1 -Action complete -Connector notion -ConnectorStatus VERIFIED -ExternalId "page-id"
+Linux/macOS: ./source.sh complete --connector notion --connector-status VERIFIED --external-id "page-id"
 ```

@@ -1,12 +1,15 @@
-# SOURCE
+# SOURCE — PROTECTED
 
-這是本專案唯一操作入口。
+本檔是專案唯一入口，不能直接修改；正式變更必須使用 Source authority gate。
 
-```powershell
-./source.ps1                         # 自動初始化、開工或中斷續接
-./source.ps1 -Action next            # 顯示做到哪與唯一下一步
-./source.ps1 -Action finish          # 收工與同步
-./source.ps1 -Action doctor          # 權限與完整性檢查
+```text
+Windows       ./source.ps1
+Linux/macOS   ./source.sh
 ```
 
-狀態以 `.source/state.json` 為準；給人看的摘要在 `handoff.md`。不要手工修改 state，讓 `source.ps1` 寫入 checkpoint。
+- `next`：目前狀態與唯一下一步。
+- `doctor`：工具、權限、相對路徑、signature、hash、唯讀檢查。
+- `finish`：保存 checkpoint、Git 與 connector 狀態。
+- `authority-unlock --yes` → 核准修改 → `authority-seal --yes`：唯一權威修改流程。
+
+不可手改 `.source/state.json` 或 `handoff.md`。canonical JSON 只保存 root-relative 路徑；OS 絕對路徑只允許 runtime 解析。

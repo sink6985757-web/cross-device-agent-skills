@@ -1,32 +1,33 @@
 # Handoff
 
-> 本檔由 source.ps1 產生；canonical 狀態是 .source/state.json。
+> GENERATED／DO NOT EDIT：本檔只能由 Source engine 產生；canonical checkpoint 是 `.source/state.json`。
 
 ## 目前做到哪
 
-收工完成，可安全換電腦或 Agent。
+本地收工完成；等待 connector：obsidian, notion。
 
 ## 狀態
 
-- Phase：READY
-- Revision：13
-- Last action：finish
-- Git：VERIFIED；branch=main；last_push=dfe7a5b
+- Phase：AWAITING_EXTERNAL
+- Revision：15
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=dfe7a5b
 
 ## 下一步
 
-1. 下次執行 `./source.ps1` 自動開工。
+1. 完成 obsidian connector，再執行 Source complete。
+2. 完成 notion connector，再執行 Source complete。
 
 ## Connectors
 
 - github：READY
 - skills：VERIFIED
-- gdrive：RUNTIME
-- obsidian：VERIFIED
-- notion：VERIFIED
+- gdrive：DETECTED
+- obsidian：PENDING_AGENT
+- notion：PENDING_AGENT
 - cdn：NOT_CONFIGURED
 
 ## 最後更新
 
-- 2026-07-21T14:43:43Z
-- Agent @ YULIN-SFG16-72
+- 2026-07-21T15:14:43Z
+- Codex @ windows

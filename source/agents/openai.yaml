@@ -1,4 +1,4 @@
 interface:
-  display_name: "Source 專案管線"
-  short_description: "用單一入口完成初始化、續接、收工與跨裝置同步部署流程"
-  default_prompt: "Use $source to inspect this project and continue the next safe pipeline step."
+  display_name: "Source 跨系統專案管線"
+  short_description: "用單一入口完成跨系統初始化、續接、收工與權威鎖定流程"
+  default_prompt: "Use $source to inspect this project, preserve authority boundaries, and continue the next safe cross-platform step."

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "project_name": "Source project pipeline",
   "project_kind": "skill-distribution",
   "default_branch": "main",
@@ -13,8 +13,10 @@
       "handoff.md",
       "README.md",
       "source.ps1",
+      "source.sh",
       ".gitattributes",
       ".gitignore",
+      ".github",
       "source",
       "project-init",
       "startup",

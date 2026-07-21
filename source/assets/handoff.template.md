@@ -1,3 +1,5 @@
 # Handoff
 
-本檔由 `source.ps1` 產生。請執行 `./source.ps1 -Action next` 取得即時狀態與唯一下一步。
+> GENERATED／DO NOT EDIT：本檔只能由 Source engine 產生；canonical checkpoint 是 `.source/state.json`。
+
+尚未產生 checkpoint。請執行 Source。

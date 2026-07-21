@@ -1,64 +1,79 @@
-# SOURCE：唯一入口
+# SOURCE：跨系統唯一入口
 
-你只需要記一個入口：
-
-```powershell
-./source.ps1
-```
-
-它會自動判定：
+只需依作業系統執行同一個 Source 概念：
 
 ```text
-沒有狀態 → 初始化
-READY    → 開工
-WORKING  → 顯示中斷點與下一步
-等待外部 → 顯示尚缺的 Notion／Obsidian／CDN checkpoint
+Windows       ./source.ps1
+Linux/macOS   ./source.sh
 ```
 
-## 全新電腦／全新專案
+無參數會自動判定：沒有 state → 初始化；`READY` → 開工；工作中／等待外部 → 顯示 checkpoint 與唯一下一步。
 
-唯一不可省略的是 GitHub 身分驗證；私有 repo 不應繞過權限。
+## 全新電腦一鍵部署
+
+私有 repository 的首次登入不能繞過。先完成 `gh auth login`，或由已授權的 Google Drive／USB 取得本 repository，再執行一次 bootstrap。
+
+### Windows
 
 ```powershell
-gh auth login
 $sourceBootstrap = Join-Path $env:TEMP ("source-" + [Guid]::NewGuid())
 gh repo clone sink6985757-web/cross-device-agent-skills $sourceBootstrap
-& "$sourceBootstrap\source.ps1" -Action bootstrap -ProjectRoot "<你的專案路徑>" -Yes
+& "$sourceBootstrap\source.ps1" -Action bootstrap -ProjectRoot "<專案路徑>" -Yes
 ```
 
-`bootstrap` 會安裝 `source` 與四個相容轉接 Skill、建立 Agent adapters、初始化專案狀態與安全檔案；缺少可選工具時保留 checkpoint，不會讓已完成層級回滾。
+缺少 Python 時，`-Yes` 允許透過 winget 安裝官方 Python 套件。
+
+### Linux／macOS
+
+```bash
+source_bootstrap="$(mktemp -d)"
+gh repo clone sink6985757-web/cross-device-agent-skills "$source_bootstrap"
+"$source_bootstrap/source.sh" bootstrap --project-root "<專案路徑>" --yes
+```
+
+Linux 支援 apt、dnf、pacman、zypper、apk；macOS 使用 Homebrew。`--yes` 才允許安裝 Python、Git、gh、chezmoi。安裝後會部署五個 managed skills、Agent adapter、Source launchers、authority manifest 與 checkpoint。
 
 ## 日常口令
 
-| 口令 | 等同動作 |
+| 意圖 | Windows | Linux／macOS |
+|---|---|---|
+| 自動／續接 | `./source.ps1` | `./source.sh` |
+| 下一步 | `./source.ps1 -Action next` | `./source.sh next` |
+| 檢查 | `./source.ps1 -Action doctor` | `./source.sh doctor` |
+| 收工 | `./source.ps1 -Action finish -CommitMessage "成果" -Yes` | `./source.sh finish --commit-message "成果" --yes` |
+
+## 路徑規則
+
+| 類型 | 規則 |
 |---|---|
-| `source`／「下一步」 | `./source.ps1 -Action next` |
-| 「初始化」 | `./source.ps1 -Action init` |
-| 「開工」 | `./source.ps1 -Action start` |
-| 「收工」 | `./source.ps1 -Action finish -CommitMessage "具體成果"` |
-| 「檢查」 | `./source.ps1 -Action doctor` |
+| 專案 canonical JSON | 只能使用專案 root-relative 路徑，例如 `docs/spec.md` |
+| 個人共用核心 | 只能使用 home-relative 表示，例如 `~/.agents/skills` |
+| Runtime | 可解析磁碟機、mount point、`$HOME`、temp、Git／chezmoi 實際位置，但不得回寫 canonical JSON |
+| URL／Page ID | 是外部識別，不是裝置檔案路徑，可以保存 |
+| 禁止 | `C:\Users\...`、`/home/name/...`、`/Users/name/...`、UNC 等裝置綁定路徑 |
 
-`project-init`、`startup`、`shutdown` 仍可觸發，但都只轉接到同一個 `source` 狀態機；`notion-conversation-log` 也只轉接到同一個 Notion checkpoint，不再建立重複 Log。
+`doctor` 會遞迴檢查 config、state、authority；任何持久化絕對路徑都會 `BLOCKED`。跨機資訊只保存 OS 類型，不保存電腦名稱。
 
-## Canonical state
+## 不可直接修改的權威層
 
-- `.source/config.json`：可攜設定；只允許 root-relative 路徑與公開識別。
-- `.source/state.json`：phase、revision、session、connector checkpoint、唯一下一步。
-- `handoff.md`：由 state 產生的給人看摘要。
-- `AGENTS.md`：讓不同 Agent 自動找到本入口。
+| 類別 | 檔案 | 寫入者 |
+|---|---|---|
+| `PROTECTED` | `SOURCE.md`、`AGENTS.md`、`.source/config.json`、launchers、Git 文字／排除規則 | 僅 formal change |
+| `GENERATED` | `.source/state.json`、`handoff.md`、`.source/runtime/` | 僅 Source engine |
+| `PROJECT_WORK` | authority manifest 未列入的專案工作檔 | 使用者／Agent 依任務修改 |
+| `EXTERNAL_READ_ONLY` | Notion 主 Prompt | 永不修改 |
 
-不要手工改 state。中斷、權限不足或工具缺少時，再執行 `./source.ps1` 就會從 checkpoint 接續。
+`PROTECTED` 由 `.source/authority.json`、`.source/authority.sha256` 與 SHA-256 鎖定；支援權限的檔案系統再套用 OS 唯讀。Google Drive 等不保留唯讀 attribute 的虛擬掛載會顯示 `HASH_ENFORCED`，任何未封存變更仍會阻止開工與收工。正式變更流程：
+
+```text
+authority-unlock --yes → 修改核准檔案 → 測試 → authority-seal --yes → doctor
+```
+
+任何 signature／hash 不符或 formal change 未封存都不能完成收工；支援實體唯讀但鎖失效時同樣 `BLOCKED`。
 
 ## Connector 邊界
 
-- Git／GitHub／Skill／chezmoi：腳本可驗證並執行。
-- GDrive：只偵測，不保存裝置絕對路徑。
-- Notion／Obsidian：由 Agent connector 完成後回填狀態；Prompt 永遠只讀。
-- CDN：目前沒有 provider／target，狀態固定 `NOT_CONFIGURED`；設定完整前不會猜測部署。
-
-## 安全保證
-
-- 既有檔案不覆寫；Skill 衝突先備份，必須加 `-Yes` 才替換。
-- 不自動 pull、不提交未知 untracked、不提交敏感檔。
-- repo 預設 private；驗證失敗標示 `PARTIAL`／`BLOCKED`，不假裝成功。
-- canonical 設定不保存磁碟絕對路徑、token、cookie 或 credentials。
+- Git／GitHub／Skill／chezmoi：engine 執行並驗證。
+- GDrive：只做 runtime 偵測，不保存實際 mount path。
+- Notion／Obsidian：Agent 回讀成功才回填 `VERIFIED`；Prompt 永遠只讀。
+- CDN：provider／target 未設定時保持 `NOT_CONFIGURED`，不猜測部署位置。
