@@ -4,14 +4,14 @@
 
 ## 目前做到哪
 
-全部收工 connector 已完成。
+收工完成，可安全換電腦或 Agent。
 
 ## 狀態
 
 - Phase：READY
-- Revision：11
-- Last action：complete-notion
-- Git：VERIFIED；branch=main；last_push=6441ed1
+- Revision：12
+- Last action：finish-preflight
+- Git：DIRTY；branch=main；last_push=6441ed1
 
 ## 下一步
 
@@ -28,5 +28,5 @@
 
 ## 最後更新
 
-- 2026-07-21T14:42:34Z
+- 2026-07-21T14:43:39Z
 - Agent @ YULIN-SFG16-72

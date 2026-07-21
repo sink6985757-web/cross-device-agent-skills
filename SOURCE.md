@@ -26,7 +26,7 @@ gh repo clone sink6985757-web/cross-device-agent-skills $sourceBootstrap
 & "$sourceBootstrap\source.ps1" -Action bootstrap -ProjectRoot "<你的專案路徑>" -Yes
 ```
 
-`bootstrap` 會安裝 `source` 與三個相容口令 Skill、建立 Agent adapters、初始化專案狀態與安全檔案；缺少可選工具時保留 checkpoint，不會讓已完成層級回滾。
+`bootstrap` 會安裝 `source` 與四個相容轉接 Skill、建立 Agent adapters、初始化專案狀態與安全檔案；缺少可選工具時保留 checkpoint，不會讓已完成層級回滾。
 
 ## 日常口令
 
