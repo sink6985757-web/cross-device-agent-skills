@@ -2,22 +2,23 @@
   "schema_version": 3,
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
-  "phase": "READY",
-  "revision": 25,
-  "session_id": null,
-  "summary": "全部收工 connector 已完成。",
-  "last_action": "complete-notion",
-  "updated_at": "2026-07-21T15:57:49Z",
+  "phase": "AWAITING_EXTERNAL",
+  "revision": 27,
+  "session_id": "4d95bebe-c7a4-40e2-b6c9-fbb16b43f03c",
+  "summary": "本地收工完成；等待 connector：obsidian, notion。",
+  "last_action": "finish-preflight",
+  "updated_at": "2026-07-21T16:15:54Z",
   "actor": {
-    "agent": "Codex",
+    "agent": "Agent",
     "platform": "windows"
   },
   "next_steps": [
-    "下一台電腦執行 Source 即可自動開工。"
+    "完成 obsidian connector，再執行 Source complete。",
+    "完成 notion connector，再執行 Source complete。"
   ],
   "git": {
     "enabled": true,
-    "status": "VERIFIED",
+    "status": "DIRTY",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
@@ -32,8 +33,8 @@
     },
     "skills": {
       "status": "VERIFIED",
-      "external_id": null,
-      "note": "source=INSTALLED; project-init=INSTALLED; startup=INSTALLED; shutdown=INSTALLED; notion-conversation-log=INSTALLED; adapters=VERIFIED"
+      "external_id": "515618904e2b9dd2c9b7129ba5797b04c6ea0997",
+      "note": "source=MATCH; project-init=MATCH; startup=MATCH; shutdown=MATCH; notion-conversation-log=MATCH; adapters=VERIFIED"
     },
     "gdrive": {
       "status": "DETECTED",
@@ -41,12 +42,12 @@
       "note": null
     },
     "obsidian": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": "cross-device-agent-skills-master/專案工作流程.md",
       "note": "已回讀主幹、子專案、競爭鎖與技能提案紀錄"
     },
     "notion": {
-      "status": "VERIFIED",
+      "status": "PENDING_AGENT",
       "external_id": "https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370",
       "note": "已回讀 W30 同頁、GitHub Actions 證據與 Prompt 修改 0"
     },

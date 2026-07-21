@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
+  "project_name": "Source project pipeline",
+  "session_id": "4d95bebe-c7a4-40e2-b6c9-fbb16b43f03c",
+  "started_at": "2026-07-21T16:14:45Z",
+  "events": [
+    {
+      "event": "start",
+      "at": "2026-07-21T16:14:45Z",
+      "agent": "Agent"
+    },
+    {
+      "event": "finish",
+      "at": "2026-07-21T16:15:53Z",
+      "agent": "Agent"
+    }
+  ],
+  "status": "FINISHED",
+  "finished_at": "2026-07-21T16:15:53Z",
+  "summary": "本地收工完成；等待 connector：obsidian, notion。"
+}
