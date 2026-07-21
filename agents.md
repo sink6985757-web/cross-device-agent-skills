@@ -17,7 +17,7 @@
 - [x] 將 Notion Knowledge Master 與主 Prompt 規則整合為 L4
 - [x] 建立 chezmoi 管理的跨 Agent 共用 Skill 主庫與私有 dotfiles 備份
 - [x] 將 L4 權威入口名稱統一為 Knowledge Master
-- [ ] 在不同電腦與 Agent 上進行實際接續驗證
+- [x] 在不同電腦與 Agent 上進行實際接續驗證
 
 ## 資料夾結構
 

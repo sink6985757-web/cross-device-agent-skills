@@ -4,20 +4,21 @@
 
 ## ⏯️ 目前做到哪
 
-已完成新電腦（DESKTOP-P5NQS9D）的 chezmoi 安裝與三技能部署：
-- 安裝 chezmoi v2.71.1，初始化本機 source repo
-- 將 project-init、startup、shutdown 部署到 `~/.agents/skills/`（chezmoi 管理）及 Hermes 技能目錄
-- chezmoi source 已 push 到 GitHub `sink6985757-web/dotfiles`（master）
+已由 Codex 在 YULIN-SFG16-72 接續 Hermes 於 DESKTOP-P5NQS9D 的交接，實際完成一次「開工→工作→收工」跨電腦、跨 Agent 循環：
+
+- 開工時讀取 L1 交接、確認 L2 Git 遠端同步，並重新讀取 L4 Knowledge Master 與主 Prompt
+- 工作階段驗證三個 repo Skill 與 `~/.agents/skills` 正式安裝版 SHA-256 一致，frontmatter 與治理護欄全數通過
+- 收工更新 L1 藍圖與交接、L3 Obsidian 詳細紀錄，並把 L4 開工檢查點更新回同一個 W30 Page ID
 
 ## 🚦 目前狀態
 
-本機四層環境已就緒，可在 DESKTOP-P5NQS9D 上正常使用 project-init／startup／shutdown 三技能。同台電腦的下一對話可直接「開工」續接。跨電腦驗證尚未完成。
+跨電腦與跨 Agent 的完整循環已驗證通過；Git diff 檢查通過、敏感檔名掃描為 0，Prompt 修改數為 0。L1～L4 均可續接，本次 Git push 與 L4 最終回讀正在收工流程中完成。
 
 ## ➡️ 下一步
 
-1. 在另一台電腦執行 `chezmoi init --apply https://github.com/sink6985757-web/dotfiles.git`，拉取三技能
-2. 實際執行一次完整的「開工→工作→收工」循環，驗證 L4 Notion 路由
-3. 補測 `READ_ONLY` 零寫入與 `AUTO_SAVE` 同頁更新情境
+1. 補測明確 `READ_ONLY` 的 Notion 零寫入情境
+2. 在一次後續 `AUTO_SAVE` 中再次確認同週同頁最小更新
+3. 視需要在拋棄式測試專案跑一次 `project-init` 初始化驗證
 
 ## ⚠️ 注意事項
 
@@ -26,12 +27,11 @@
 - `.env`、金鑰與 credentials 檔案不得提交。
 - L4 每次必須重新讀取 Knowledge Master 共用公約與正式主題 Prompt；Prompt 頁只讀。
 - 同週 `00_system` 只更新原 Page ID，不建立 v2／最新版／修正版。
-- Notion 不得保存 Secret、Token、帳密、公司或客戶機密、裝置內部路徑與未公開技術內容。
-- 本機無 Obsidian，L3 筆記待回有 Obsidian 的電腦補建。
+- 目前 PowerShell 缺少 `System.Globalization.ISOWeek` 型別；週次計算改用 `Calendar.GetWeekOfYear` 相容路徑。
 
 ## 🕐 最後更新
 
-- 時間：2026-07-21 21:05
-- 更新者：Hermes @ DESKTOP-P5NQS9D
-- Git push：✅ 已推（cross-device-agent-skills main）
-- Notion：`00_system｜AUTO_SAVE｜2026-W30｜00_system｜更新｜VERIFIED`
+- 時間：2026-07-21 21:47
+- 更新者：Codex @ YULIN-SFG16-72
+- Git push：待推（cross-device-agent-skills main）
+- Notion：`00_system｜AUTO_SAVE｜2026-W30｜00_system｜待完成收工更新`
