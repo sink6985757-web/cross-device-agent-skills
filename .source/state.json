@@ -3,11 +3,11 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 33,
-  "session_id": "ba6fbff2-555d-4e27-a6fe-6e2508d2aac5",
+  "revision": 34,
+  "session_id": null,
   "summary": "收工完成，可安全換電腦、OS 或 Agent。",
-  "last_action": "finish-preflight",
-  "updated_at": "2026-07-21T16:28:32Z",
+  "last_action": "finish",
+  "updated_at": "2026-07-21T16:28:57Z",
   "actor": {
     "agent": "Agent",
     "platform": "windows"
@@ -17,12 +17,12 @@
   ],
   "git": {
     "enabled": true,
-    "status": "DIRTY",
+    "status": "VERIFIED",
     "branch": "main",
     "remote": "https://github.com/sink6985757-web/cross-device-agent-skills.git",
     "ahead": 0,
     "behind": 0,
-    "last_push": "06919a3"
+    "last_push": "2921673"
   },
   "connectors": {
     "github": {
