@@ -3,11 +3,11 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 38,
+  "revision": 39,
   "session_id": null,
   "summary": "全部收工 connector 已完成。",
-  "last_action": "complete-obsidian",
-  "updated_at": "2026-07-21T16:34:54Z",
+  "last_action": "complete-notion",
+  "updated_at": "2026-07-21T23:04:37Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
@@ -48,7 +48,7 @@
     "notion": {
       "status": "VERIFIED",
       "external_id": "https://app.notion.com/p/3a4367cc4e4c81239ac3d61ce049d370",
-      "note": "2026-W30 既有唯一頁已最小更新並回讀；父頁=00_system；Prompt 修改=0"
+      "note": "2026-W30 既有唯一頁已更新並回讀；巡檢報告狀態=PARTIAL；父頁=00_system；Prompt 修改=0"
     },
     "cdn": {
       "status": "NOT_CONFIGURED",
