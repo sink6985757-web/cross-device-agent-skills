@@ -8,7 +8,7 @@
 
 ## 🚦 目前狀態
 
-本地四層流程與跨 Agent 共用主庫均已完成；Knowledge Master 標題與共用公約已使用新名稱，Prompt 保持只讀。GitHub 與 Notion 正在執行本次正式收工同步，驗證通過後回填最終 commit 與狀態。
+本地四層流程與跨 Agent 共用主庫均已完成；Knowledge Master 標題與共用公約已使用新名稱，Prompt 保持只讀。技能專案與 dotfiles 已推送 GitHub，Obsidian 與本週唯一 Notion 正式頁也已完成收工同步並回讀驗證。
 
 ## ➡️ 下一步
 
@@ -27,7 +27,7 @@
 
 ## 🕐 最後更新
 
-- 時間：2026-07-21 20:25
+- 時間：2026-07-21 20:32
 - 更新者：Codex @ YULIN-SFG16-72
-- Git push：⏳ 待推（技能專案與 dotfiles 名稱同步）
-- Notion：`00_system｜AUTO_SAVE｜2026-W30｜00_system｜待更新`
+- Git push：✅ 已推（`cross-device-agent-skills` 與 `dotfiles` 的 `main`）
+- Notion：`00_system｜AUTO_SAVE｜2026-W30｜00_system｜更新｜VERIFIED`
