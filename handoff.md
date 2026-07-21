@@ -4,18 +4,18 @@
 
 ## 目前做到哪
 
-尚待 connector：notion。
+全部收工 connector 已完成。
 
 ## 狀態
 
-- Phase：AWAITING_EXTERNAL
-- Revision：17
-- Last action：complete-obsidian
+- Phase：READY
+- Revision：18
+- Last action：complete-notion
 - Git：VERIFIED；branch=main；last_push=5c80f17
 
 ## 下一步
 
-1. 完成 notion connector。
+1. 下一台電腦執行 Source 即可自動開工。
 
 ## Connectors
 
@@ -23,10 +23,10 @@
 - skills：VERIFIED
 - gdrive：DETECTED
 - obsidian：VERIFIED
-- notion：PENDING_AGENT
+- notion：VERIFIED
 - cdn：NOT_CONFIGURED
 
 ## 最後更新
 
-- 2026-07-21T15:16:16Z
+- 2026-07-21T15:18:57Z
 - Codex @ windows
