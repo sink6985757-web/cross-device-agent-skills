@@ -13,7 +13,7 @@
 - [x] 建立初始化、開工與收工三個技能及必要範本
 - [x] 建立本地專案藍圖與交接機制
 - [x] 建立 Obsidian 專案工作流程筆記
-- [ ] 完成 GitHub 私有 repository 與初始推送
+- [x] 完成 GitHub 私有 repository 與初始推送
 - [ ] 在不同電腦與 Agent 上進行實際接續驗證
 
 ## 資料夾結構
@@ -38,7 +38,7 @@ cross-device-agent-skills-master/
 | 層級 | 平台 | 位置 | 讀取時機 |
 |------|------|------|---------|
 | L1 | 本地（GDrive） | `agents.md`＋`handoff.md` | 每個 session |
-| L2 | GitHub | 待建立：`sink6985757-web/cross-device-agent-skills`（private） | 指定時 |
+| L2 | GitHub | `sink6985757-web/cross-device-agent-skills`（private） | 指定時 |
 | L3 | Obsidian | `cross-device-agent-skills-master/專案工作流程.md` | 有需要時 |
 
 ## 工作約定
@@ -47,4 +47,3 @@ cross-device-agent-skills-master/
 - 修改共用檔案前先讀最新內容，避免覆蓋其他 Agent 的變更
 - 所有回應與文件使用繁體中文
 - 修改前先確認計畫，優先保留原有資料結構
-
