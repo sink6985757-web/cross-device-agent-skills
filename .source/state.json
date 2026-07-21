@@ -3,17 +3,17 @@
   "project_id": "64851505-857c-4dd4-a9f1-064d82331b43",
   "project_name": "Source project pipeline",
   "phase": "READY",
-  "revision": 42,
+  "revision": 43,
   "session_id": null,
-  "summary": "本地可繼續；connector 未完整：obsidian=BLOCKED。",
-  "last_action": "finish",
-  "updated_at": "2026-07-21T23:22:20Z",
+  "summary": "全部已啟用 connector 均完成或可用。",
+  "last_action": "complete-obsidian",
+  "updated_at": "2026-07-21T23:23:58Z",
   "actor": {
     "agent": "Codex",
     "platform": "windows"
   },
   "next_steps": [
-    "處理 obsidian connector（BLOCKED）後重新回填 checkpoint。"
+    "下一台電腦執行 Source 即可自動開工。"
   ],
   "git": {
     "enabled": true,
@@ -41,9 +41,9 @@
       "note": null
     },
     "obsidian": {
-      "status": "BLOCKED",
+      "status": "VERIFIED",
       "external_id": "cross-device-agent-skills-master/專案工作流程.md",
-      "note": "config 指定的 vault-relative note 在目前同步目錄不存在；未猜測路徑或建立替代檔。請確認 Obsidian vault 同步後重試。"
+      "note": "既有 Obsidian 專案頁已更新並回讀；包含 Co-Agent mix、README 安裝流程、connector rollup、測試與 GitHub commit"
     },
     "notion": {
       "status": "VERIFIED",
