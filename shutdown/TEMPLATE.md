@@ -23,7 +23,8 @@
 
 ## 最近更新
 - 時間：<YYYY-MM-DD HH:mm，含時區>
-- 更新者：<Agent 名稱；不記錄電腦名稱>
+- 更新者：<Agent 名稱>
+- 電腦：<本機電腦名稱>
 - 成果 commit：<SHA／未提交／NOT_CONFIGURED>
 - Git push：<VERIFIED／PARTIAL／BLOCKED／NOT_CONFIGURED>
 - Obsidian：<VERIFIED／PARTIAL／BLOCKED／NOT_CONFIGURED>
@@ -35,6 +36,8 @@
 # 收工報告
 
 - 整體：<VERIFIED｜PARTIAL｜BLOCKED>
+- Agent：<本次 Agent 名稱>
+- 電腦：<本機電腦名稱>
 - 本地：<完成內容>
 - GitHub：<repository、commit、push 狀態>
 - Obsidian：<筆記相對路徑與回讀狀態>

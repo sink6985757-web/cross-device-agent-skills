@@ -7,9 +7,12 @@
 
 - 專案：<名稱>
 - 狀態：<VERIFIED｜PARTIAL｜BLOCKED>
+- Agent：<本次 Agent 名稱>
+- 電腦：<本機電腦名稱>
 
 ## 本機環境
 - [ ] OS 已辨識
+- [ ] 本機電腦名稱已辨識
 - [ ] Git 可用
 - [ ] GitHub CLI 已登入／不使用
 - [ ] `~/.agents/skills/initial` 已部署
@@ -75,6 +78,7 @@
 
 ## 最近更新
 - 時間：<YYYY-MM-DD HH:mm，含時區>
-- 更新者：<Agent 名稱；不記錄電腦名稱>
+- 更新者：<Agent 名稱>
+- 電腦：<本機電腦名稱>
 - Git push：<已推／未推／NOT_CONFIGURED>
 ```

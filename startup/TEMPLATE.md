@@ -5,9 +5,13 @@
 
 - 專案：<名稱>
 - 狀態：<VERIFIED｜PARTIAL｜BLOCKED>
+- 本次 Agent：<Agent 名稱>
+- 本機電腦：<本機電腦名稱>
 - 目標：<AGENTS.md 摘要>
 
 ## 上次做到哪
+- 上次 Agent：<handoff 記錄｜UNKNOWN>
+- 上次電腦：<handoff 記錄｜UNKNOWN>
 <handoff 摘要，最多三句>
 
 ## Git

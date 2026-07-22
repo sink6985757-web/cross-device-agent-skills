@@ -1,6 +1,6 @@
 # 跨裝置 Agent 三技能
 
-> 架構版本：**Three-Skill Lite v1.0.0**（2026-07-22）
+> 架構版本：**Three-Skill Lite v1.1.0**（2026-07-22）
 
 這個 repository 只做三件事：初始化、開工、收工。每個技能只有 `SKILL.md` 與一份固定 `TEMPLATE.md`；每個專案只產生 `AGENTS.md` 與 `handoff.md` 兩個共用檔案。
 
@@ -29,7 +29,7 @@ cross-device-agent-skills/
 | 開工 | `startup` | 只讀兩個專案檔與 Git 狀態，用固定模板回報 |
 | 收工 | `shutdown` | 更新交接、GitHub 與 Obsidian，用固定模板回報 |
 
-`AGENTS.md` 是所有 Agent 的共同專案說明；`handoff.md` 只保存最近一次交接。詳細決策與踩坑放 Obsidian，不塞進交接檔。
+`AGENTS.md` 是所有 Agent 的共同專案說明；`handoff.md` 只保存最近一次交接，以及執行該次交接的 Agent 與本機電腦名稱。詳細決策與踩坑放 Obsidian，不塞進交接檔。
 
 ## 安裝
 
@@ -75,6 +75,7 @@ cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills
 `initial` 會依 `initial/TEMPLATE.md` 檢查：
 
 - 這台機器的 OS、Git、GitHub CLI 與登入狀態。
+- 本次執行的 Agent 名稱與本機電腦名稱。
 - 三技能是否已部署到共用技能目錄。
 - 專案是否已有 Git、remote、`AGENTS.md`、`handoff.md`。
 - 是否能定位 Obsidian vault。
@@ -88,7 +89,7 @@ cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills
 開工
 ```
 
-`startup` 只讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，不修改檔案、不自動 pull。輸出固定使用 `startup/TEMPLATE.md`。
+`startup` 只讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，不修改檔案、不自動 pull；回報同時顯示本次與上次使用的 Agent、電腦名稱。輸出固定使用 `startup/TEMPLATE.md`。
 
 ### 3. 收工
 
@@ -96,7 +97,7 @@ cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills
 收工
 ```
 
-`shutdown` 更新 `handoff.md`，必要時更新 `AGENTS.md` 路線圖；確認變更安全後 commit／push，並更新 `AGENTS.md` 登記的 Obsidian 筆記。輸出固定使用 `shutdown/TEMPLATE.md`。
+`shutdown` 把本次 Agent 與本機電腦名稱寫入 `handoff.md`，必要時更新 `AGENTS.md` 路線圖；確認變更安全後 commit／push，並更新 `AGENTS.md` 登記的 Obsidian 筆記。輸出固定使用 `shutdown/TEMPLATE.md`。
 
 ## 每個專案只需要的兩個檔案
 
@@ -106,7 +107,7 @@ cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills
 
 ### `handoff.md`
 
-保存變動資訊：目前做到哪、狀態、下一步、注意事項與最近一次 Git push。開工只讀，收工重寫，不累積長篇日誌。
+保存變動資訊：目前做到哪、狀態、下一步、注意事項、最近一次 Git push，以及最後更新的 Agent 與電腦名稱。開工只讀，收工重寫，不累積長篇日誌。
 
 ## GitHub 維護
 
@@ -136,8 +137,8 @@ gh repo view sink6985757-web/cross-device-agent-skills
 不要提交 `.env`、token、key、credential、Agent cache 或未知 untracked 檔。發布新架構版本時更新本 README 的版本號，再建立 annotated tag：
 
 ```bash
-git tag -a v1.0.0 -m "Three-Skill Lite v1.0.0"
-git push origin v1.0.0
+git tag -a v1.1.0 -m "Three-Skill Lite v1.1.0"
+git push origin v1.1.0
 ```
 
 ## 版本與回滾
