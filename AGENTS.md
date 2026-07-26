@@ -6,6 +6,6 @@
 2. `SKILL.md` 定義判斷與操作；`TEMPLATE.md` 定義固定輸出，不在多處複製同一規則。
 3. 初始化產生的專案共用檔固定為 `AGENTS.md` 與 `handoff.md`。
 4. 不加入狀態機、runtime engine、session database、Notion connector 或裝置絕對路徑。
-5. GitHub repository 維持 private；不提交 secret、credential、cache 或未知 untracked 檔。
+5. GitHub repository 為公開安裝來源；不得提交 secret、credential、cache、個人路徑或未知 untracked 檔。
 6. 架構、安裝、使用、GitHub 維護與版本規則以 `README.md` 為準。
 7. 初始化、開工與收工回報都要記錄 Agent 名稱與 runtime 取得的本機電腦名稱；不得拿電腦名稱代替 Git／同步驗證。
