@@ -16,7 +16,7 @@ description: 專案收工、交接與同步。當使用者說收工、shutdown�
    - 只 stage 本次已知檔案；未知 untracked、secret 或 credential 一律停止。
    - 使用具體繁體中文 commit 訊息，推送既有 private remote。
    - 沒有 remote 或認證時標示 `PARTIAL`，保留本地 commit 或精確續跑點。
-4. 若 `AGENTS.md` 登記 Obsidian，更新既有專案筆記的「上次做到哪、決策／踩坑、最近更動」並回讀；最近更動的更新者使用 `<Agent> @ <電腦名稱>`。找不到不得猜路徑。
+4. 若 `AGENTS.md` 登記 Obsidian 或專案包含 Obsidian 整合，驗證 `Obsidian/Projects/<專案名>.md` 捷徑筆記是否存在；新專案或尚未建立捷徑筆記者，於收工時自動建立雙重連結捷徑筆記，不複製專案實體檔案。更新既有專案捷徑筆記或備註，最近更動的更新者使用 `<Agent> @ <電腦名稱>`。找不到不得猜路徑。
 5. Git push 後再把實際結果回填 `handoff.md`；若因此產生第二個 commit，必須一併 push。
 6. 最後依 `TEMPLATE.md` 回報每一層狀態與唯一續跑點。
 

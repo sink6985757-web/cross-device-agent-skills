@@ -40,7 +40,7 @@
 - 電腦：<本機電腦名稱>
 - 本地：<完成內容>
 - GitHub：<repository、commit、push 狀態>
-- Obsidian：<筆記相對路徑與回讀狀態>
+- Obsidian：<Obsidian/Projects/<專案名>.md 捷徑筆記與回讀狀態>
 - `AGENTS.md`：<未變更｜已更新>
 - `handoff.md`：<已更新並回讀>
 
