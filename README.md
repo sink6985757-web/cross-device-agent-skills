@@ -1,184 +1,138 @@
-# 跨裝置 Agent 三技能
+# Cross-Device Agent Skills
 
-> 架構版本：**Three-Skill Lite v1.1.1**（2026-07-26）
+跨裝置專案生命週期的公開 Lite 套件，只包含三個自足技能：`initial`、`startup`、`shutdown`。適合 Codex、Claude、Gemini、Hermes 或其他能讀取 Markdown 技能的 Agent。
 
-這個公開 repository 只做三件事：初始化、開工、收工。每個技能只有 `SKILL.md` 與一份固定 `TEMPLATE.md`；每個專案只產生 `AGENTS.md` 與 `handoff.md` 兩個共用檔案。
+目前 GitHub 發行版：`v1.1.1`
+開發中版本：`v2.0.0`（尚未 commit／push／tag）
 
-本 repository 不保存任何人的裝置名稱、家目錄、Obsidian vault 位置、token 或 credential。文件中的 `$HOME`、`~` 與 `<PROJECT_ROOT>` 都是執行時才解析的可攜表示法，不應改成某台電腦的固定絕對路徑並提交。
-
-## 架構
+## 套件內容
 
 ```text
 cross-device-agent-skills/
-├─ initial/
-│  ├─ SKILL.md
-│  └─ TEMPLATE.md
-├─ startup/
-│  ├─ SKILL.md
-│  └─ TEMPLATE.md
-├─ shutdown/
-│  ├─ SKILL.md
-│  └─ TEMPLATE.md
+├─ initial/SKILL.md
+├─ startup/SKILL.md
+├─ shutdown/SKILL.md
 ├─ AGENTS.md
-├─ README.md
-├─ .gitattributes
-└─ .gitignore
+├─ CHANGELOG.md
+├─ handoff.md
+└─ README.md
 ```
 
-| 口令 | 技能 | 作用 |
+每個技能目錄只允許一個 `SKILL.md`。流程、相依、模板與固定輸出全部內嵌，不再使用 `TEMPLATE.md`。
+
+| 技能 | 用途 | 寫入行為 |
 |---|---|---|
-| 初始化專案 | `initial` | 偵測本機工具、部署三技能、建立 `AGENTS.md` 與 `handoff.md` |
-| 開工 | `startup` | 只讀兩個專案檔與 Git 狀態，用固定模板回報 |
-| 收工 | `shutdown` | 更新交接、GitHub 與 Obsidian，用固定模板回報 |
+| `initial` | 初始化新專案或補齊既有專案缺件 | 只建立缺少的四檔，不覆寫既有內容 |
+| `startup` | 開工與續跑 | 唯讀規則、handoff 與 Git 狀態 |
+| `shutdown` | 收工、版本紀錄與交接 | 更新 `CHANGELOG.md`、`handoff.md`；外部動作另行放行 |
 
-`AGENTS.md` 是所有 Agent 的共同專案說明；`handoff.md` 只保存最近一次交接，以及執行該次交接的 Agent 與本機電腦名稱。詳細決策與踩坑放在專案指定的知識庫，不塞進交接檔。
+## 權威與相依關係
 
-## 新使用者安裝
+| 層級 | Canonical | 責任 |
+|---|---|---|
+| Lite 公開發行 | 本 repository | `initial`／`startup`／`shutdown` 的安裝與版本權威 |
+| Runtime 安裝 | `~/.agents/skills/<skill>/SKILL.md` | Agent 實際讀取的執行副本，不是發行權威 |
+| Full Core | [`cross-device-agent-workflow-core`](https://github.com/sink6985757-web/cross-device-agent-workflow-core) | 首次部署、完整治理、相容性驗證與 Core profile |
+| ReadyGate | [`readygate-skill-chatgpt-app`](https://github.com/sink6985757-web/readygate-skill-chatgpt-app) | commit、push、發布、搬移、封存、權限與其他高風險動作的工作單／閘門 |
+| 專案狀態 | 各專案 repository | 專案自己的四檔與 Git 歷史才是該專案權威 |
 
-### 需求
+Core profile 使用四個技能：Lite 三技能加 `readygate`。Lite profile 本身不強制安裝 ReadyGate，但單獨口令「收工」不授權任何外部 Git、發布、搬移或封存動作。
 
-- Git。
-- Windows PowerShell 5.1 以上，或 Linux／macOS 的 Bash。
-- 能讀取 `~/.agents/skills` 的 Agent；不支援時可建立薄轉接。
-- GitHub CLI `gh` 不是必要條件；只有維護 repository 或使用 private fork 時才需要。
+Notion、Obsidian、Knowledge Master 與其他外部知識庫皆為 `ON_DEMAND_ONLY`，不屬於 initial／startup／shutdown 流程。
 
-先在目前工作資料夾下載 repository：
+## 專案四檔契約
 
-```bash
-git clone https://github.com/sink6985757-web/cross-device-agent-skills.git
-```
+| 檔案 | 唯一責任 | 更新時機 |
+|---|---|---|
+| `AGENTS.md` | 穩定規則、權威來源、邊界與相依路徑 | 規則或架構真的改變時 |
+| `README.md` | GitHub 人類安裝、Agent／Tool 安裝、使用、公開版本與最新變更文案 | 每次授權 GitHub delivery 前 |
+| `CHANGELOG.md` | 近期修改、驗證結果、版本與 delivery 狀態 | 每次收工 |
+| `handoff.md` | 現況、未完成事項、風險與唯一續跑點 | 每次收工，以目前狀態更新 |
 
-若三個技能已存在，請先備份或比對內容。以下命令會更新同名技能。
+`CHANGELOG.md` 是專案內獨立、可版本控制的 Markdown 變更紀錄；不需要 Obsidian 或專門的 RCD 資料夾。
+
+## 人類安裝
 
 ### Windows PowerShell
 
 ```powershell
+git clone https://github.com/sink6985757-web/cross-device-agent-skills.git
 $repo = Resolve-Path .\cross-device-agent-skills
 $skillRoot = Join-Path $HOME '.agents\skills'
 
 New-Item -ItemType Directory -Force -Path $skillRoot | Out-Null
-Copy-Item -Recurse -Force (Join-Path $repo 'initial')  $skillRoot
-Copy-Item -Recurse -Force (Join-Path $repo 'startup')  $skillRoot
-Copy-Item -Recurse -Force (Join-Path $repo 'shutdown') $skillRoot
+foreach ($name in 'initial', 'startup', 'shutdown') {
+    New-Item -ItemType Directory -Force -Path (Join-Path $skillRoot $name) | Out-Null
+    Copy-Item -Force (Join-Path $repo "$name\SKILL.md") (Join-Path $skillRoot "$name\SKILL.md")
+}
 ```
 
 ### Linux／macOS
 
 ```bash
-mkdir -p "$HOME/.agents/skills"
-cp -R cross-device-agent-skills/{initial,startup,shutdown} "$HOME/.agents/skills/"
+git clone https://github.com/sink6985757-web/cross-device-agent-skills.git
+mkdir -p "$HOME/.agents/skills"/{initial,startup,shutdown}
+for name in initial startup shutdown; do
+  cp "cross-device-agent-skills/$name/SKILL.md" "$HOME/.agents/skills/$name/SKILL.md"
+done
 ```
 
-`~/.agents/skills` 是唯一正式 Skill 來源。Codex、Gemini、Claude、Hermes 或其他 Agent 若不能原生讀取這個位置，只建立 symlink／junction 或設定外部技能目錄，不再複製第二份內容。
+重新啟動或重新載入 Agent 後，再確認三個目錄都只有 `SKILL.md`。
 
-### 安裝後確認
+## Agent／Tool 安裝
 
-應看到每個技能各有兩個檔案：
+自動化工具應執行下列規則：
 
-```powershell
-Get-ChildItem (Join-Path $HOME '.agents\skills\initial')
-Get-ChildItem (Join-Path $HOME '.agents\skills\startup')
-Get-ChildItem (Join-Path $HOME '.agents\skills\shutdown')
-```
-
-重新啟動或重新載入 Agent 後，在測試專案輸入「初始化專案」。若 Agent 找不到技能，請確認它實際讀取的技能根目錄，並把該位置轉接到 `~/.agents/skills`。
-
-### 更新
-
-在 repository 的上一層資料夾執行：
-
-```powershell
-git -C .\cross-device-agent-skills pull --ff-only
-```
-
-再重跑對應作業系統的複製命令。更新前若已自行修改技能，先用 `git diff --no-index` 或其他比對工具確認差異，避免覆蓋個人變更。
+1. clone 或 `git pull --ff-only` 本 repository，不抓取 fork 當作權威。
+2. 比較來源與 `~/.agents/skills` 的版本或 SHA-256；不同時先回報，不靜默覆寫未知修改。
+3. 只複製三個 `SKILL.md`，移除舊版 `TEMPLATE.md` 前必須確認它屬於本套件。
+4. 回讀安裝結果，確認沒有 `.env`、token、credential、cache 或裝置絕對路徑。
+5. Full Core 安裝另依 Core README 檢查 `readygate`，不要把 ReadyGate 複製進本公開 Lite repository。
 
 ## 使用
 
-### 1. 初始化專案
-
-在專案資料夾對 Agent 說：
+對 Agent 說：
 
 ```text
 初始化專案
-```
-
-`initial` 會依 `initial/TEMPLATE.md` 檢查：
-
-- 這台機器的 OS、Git、GitHub CLI 與登入狀態。
-- 本次執行的 Agent 名稱與本機電腦名稱。
-- 三技能是否已部署到共用技能目錄。
-- 專案是否已有 Git、remote、`AGENTS.md`、`handoff.md`。
-- 是否能定位使用者指定的知識庫。
-- 哪些可自動完成、哪些需要使用者登入或確認。
-
-初始化不覆寫既有檔案；若建立 GitHub repository，預設使用 private，除非使用者明確要求公開。
-
-### 2. 開工
-
-```text
 開工
-```
-
-`startup` 只讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，不修改檔案、不自動 pull；回報同時顯示本次與上次使用的 Agent、電腦名稱。輸出固定使用 `startup/TEMPLATE.md`。
-
-### 3. 收工
-
-```text
 收工
 ```
 
-`shutdown` 把本次 Agent 與本機電腦名稱寫入 `handoff.md`，必要時更新 `AGENTS.md` 路線圖；確認變更安全後 commit／push，並更新 `AGENTS.md` 登記的知識庫筆記。輸出固定使用 `shutdown/TEMPLATE.md`。
+- `初始化專案`：偵測環境、確認 Git 根目錄，並只補齊缺少的四檔。
+- `開工`：唯讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，回報可續跑點。
+- `收工`：更新 `CHANGELOG.md` 與 `handoff.md`；若本次已授權 GitHub delivery，再更新 README 公開文案並通過 Delivery Gate。
 
-## 每個專案只需要的兩個檔案
+## 更新與驗證
 
-### `AGENTS.md`
+```powershell
+git -C .\cross-device-agent-skills pull --ff-only
+git -C .\cross-device-agent-skills status --short
+git -C .\cross-device-agent-skills diff --check
+```
 
-保存穩定資訊：專案目標、目錄、工作規則、GitHub、知識庫相對路徑與路線圖。所有 Agent 每次先讀本檔。
+更新 runtime 後，應以 SHA-256 比較三個來源檔與三個安裝檔。若使用 chezmoi，`~/.agents/skills` 是本機執行來源，chezmoi source 是可重建副本；兩者必須同步但責任不可互換。
 
-### `handoff.md`
+## GitHub 維護與版本規則
 
-保存變動資訊：目前做到哪、狀態、下一步、注意事項、最近一次 Git push，以及最後更新的 Agent 與電腦名稱。開工只讀，收工重寫，不累積長篇日誌。
-
-共用檔只保存專案根目錄相對路徑，例如 `docs/operations.md`。裝置上的實際 checkout、vault 或家目錄位置只在 runtime 解析，不寫入 repository。
-
-## GitHub 維護
-
-維護本技能 repository 時只提交以下 allowlist：
+GitHub delivery 的明確 allowlist：
 
 ```text
 AGENTS.md
 README.md
+CHANGELOG.md
+handoff.md
 .gitattributes
 .gitignore
-initial/
-startup/
-shutdown/
+initial/SKILL.md
+startup/SKILL.md
+shutdown/SKILL.md
 ```
 
-標準流程：
+delivery 前必須更新 README 的安裝／使用／版本／最新變更文案及 CHANGELOG，並經工作單或 ReadyGate 確認後才可 commit、push、tag 或 release。不得 stage 未知 untracked 檔。
 
-```bash
-git status --short
-git diff --check
-git add AGENTS.md README.md .gitattributes .gitignore initial startup shutdown
-git commit -m "更新三技能架構：<摘要>"
-git push origin main
-gh repo view sink6985757-web/cross-device-agent-skills
-```
+- `v1.x`：歷史 Lite 發行線。
+- `v2.0.0`：單檔技能與專案四檔契約；目前仍是本機開發狀態。
+- 回滾使用可回讀的 Git commit 或 tag；不以 `git reset --hard` 清除未知工作。
 
-不要提交 `.env`、token、key、credential、Agent cache、個人絕對路徑或未知 untracked 檔。發布新架構版本時更新本 README 的版本號，再建立 annotated tag：
-
-```bash
-git tag -a v1.1.1 -m "Three-Skill Lite v1.1.1"
-git push origin v1.1.1
-```
-
-## 版本與回滾
-
-- `v1.x`：三技能 Lite 架構內的相容更新。
-- `v2.0.0`：輸出檔名或模板契約有破壞性變更。
-- 舊 Source 平台完整保留在 Git commit `52b9857`，未重寫歷史。
-- 若要回復舊版，建立一般 revert／restore commit；不要使用 `git reset --hard`。
-
-概念參考：[mathruffian-dot/cross-device-agent-skills](https://github.com/mathruffian-dot/cross-device-agent-skills)。本版本依跨 Agent 共用與可攜性需求重新編寫。
+歷史變更請見 [`CHANGELOG.md`](CHANGELOG.md)。
