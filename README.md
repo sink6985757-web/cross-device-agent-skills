@@ -3,7 +3,7 @@
 跨裝置專案生命週期的公開 Lite 套件，只包含三個自足技能：`initial`、`startup`、`shutdown`。適合 Codex、Claude、Gemini、Hermes 或其他能讀取 Markdown 技能的 Agent。
 
 目前 GitHub 發行版：`v1.1.1`
-開發中版本：`v2.0.0`（尚未 commit／push／tag）
+GitHub `main` 候選版本：`v2.0.0`（source 已 push；尚未 tag／Release）
 
 ## 套件內容
 
@@ -132,7 +132,7 @@ shutdown/SKILL.md
 delivery 前必須更新 README 的安裝／使用／版本／最新變更文案及 CHANGELOG，並經工作單或 ReadyGate 確認後才可 commit、push、tag 或 release。不得 stage 未知 untracked 檔。
 
 - `v1.x`：歷史 Lite 發行線。
-- `v2.0.0`：單檔技能與專案四檔契約；目前仍是本機開發狀態。
+- `v2.0.0`：單檔技能與專案四檔契約；source 已在 GitHub `main`，尚未建立 tag／Release。
 - 回滾使用可回讀的 Git commit 或 tag；不以 `git reset --hard` 清除未知工作。
 
 歷史變更請見 [`CHANGELOG.md`](CHANGELOG.md)。

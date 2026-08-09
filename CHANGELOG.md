@@ -14,7 +14,8 @@
 - 每個 Skill 目錄都只包含一個 `SKILL.md`。
 
 ### Delivery
-- GitHub：`LOCAL_ONLY`
+- GitHub：`VERIFIED`，治理 commit `924d64310959796c0520521945b8f7a4c2717684` 已推送 `main` 並回讀一致。
+- tag／Release：未執行。
 
 ## [1.1.1] - 2026-07-26
 
