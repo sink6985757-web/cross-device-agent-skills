@@ -1,30 +1,20 @@
 # Handoff
 
-## 目前做到哪
+## 目前狀態
 
-Lite `v2.0.0` GitHub `main` 候選版已將 `initial`、`startup`、`shutdown` 收斂為各一個自足 `SKILL.md`，移除三份 `TEMPLATE.md`，並改用專案四檔契約。Notion、Obsidian、Knowledge Master 與其他外部知識庫已從三流程拆出。
+- 工作單：`WO-DRIVE-GITHUB-ALIGN-20260905-v2`，使用者已確認依 v2 順序修改與同步既有 GitHub repositories。
+- 本輪：完成initial／startup／shutdown 的 manifest、remote checkpoint 與授權延續契約。既有差異已保全並納入審查。
+- 驗證：initial／startup／shutdown 三份 Skill validator PASS。 `git diff --check` 通過；以本輪提交前重跑結果為準。
+- Git 基底：`383f50275c68bbb54deeaec7d3ffc13384360528`；本文件所在提交承載本輪治理來源更新。
+- Delivery：允許 scoped commit／非 force push 到既有 default branch；遠端回讀前不宣稱已同步。
+- 發行：僅更新 source；既有 tag／Release 保持原狀。
 
-## 狀態
+## 唯一續跑點
 
-- 可執行：`YES`
-- Skill validator：三份皆 `VALID`；繁中 Windows 需以 Python UTF-8 模式執行官方 validator。
-- 來源同步：公開 checkout、runtime、active chezmoi source、Google Drive dotfiles mirror 的三組 SHA-256 已一致。
-- GitHub：`VERIFIED`；治理 commit `924d64310959796c0520521945b8f7a4c2717684` 已推送 `main` 並回讀一致。
-- tag／Release：未執行；已發布 tag 基準仍是 `v1.1.1`。
+完成本來源 default branch SHA 回讀後，將三個不可變 authority SHA 填入 `newday` 的 manual manifest，驗證 pilot；再同步 dotfiles active source、Drive mirror 與 runtime。
 
-## 下一步
+## 邊界
 
-1. 若要正式發布 `v2.0.0`，另走 tag／Release Gate。
-2. 新裝置安裝前確認是否採 GitHub `main` 候選或既有 `v1.1.1` tag。
-3. 持續維持 runtime、chezmoi source 與 mirror 的 SHA-256 對齊。
+各 repository 獨立 checkpoint；不把 Part 當 Git root。不啟用 standing_scoped，不建立 repository、tag／Release，不合併 PR、不搬移或封存。私人設定與來源不明檔案保持原狀。
 
-## 風險
-
-- GitHub 尚未包含 v2；在 delivery 完成前，不可把 `v2.0.0` 宣稱為已發布。
-- chezmoi status 另有與本工單無關的 runtime 差異；不得一起 stage。
-
-## 最近更新
-
-- 時間：2026-08-09 Asia/Taipei
-- Agent：Codex
-- 成果 revision：未提交工作樹
+更新：2026-09-05，Codex。跨裝置接續以實際 Git SHA 與 Drive 回讀為準。

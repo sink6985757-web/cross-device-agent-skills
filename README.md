@@ -1,5 +1,11 @@
 # Cross-Device Agent Skills
 
+## 2026-09-05 維護更新
+
+本次 source 更新包含initial／startup／shutdown 的 manifest、remote checkpoint 與授權延續契約。版本以 Git commit 識別；既有發行 tag 保持不變。當本次對話或已確認工作單已明列更新、commit／push 與驗收範圍，沿用該授權完成，不為相同動作重複提問；未涵蓋的動作仍停在確認點。Startup 維持唯讀，完成讀取報告後可轉入已授權的獨立工作階段。
+
+目前交接與驗收範圍見 [handoff.md](handoff.md)，歷史變更見 [CHANGELOG.md](CHANGELOG.md)。
+
 跨裝置專案生命週期的公開 Lite 套件，只包含三個自足技能：`initial`、`startup`、`shutdown`。適合 Codex、Claude、Gemini、Hermes 或其他能讀取 Markdown 技能的 Agent。
 
 目前 GitHub 發行版：`v1.1.1`
@@ -20,11 +26,24 @@ cross-device-agent-skills/
 
 每個技能目錄只允許一個 `SKILL.md`。流程、相依、模板與固定輸出全部內嵌，不再使用 `TEMPLATE.md`。
 
-| 技能 | 用途 | 寫入行為 |
-|---|---|---|
-| `initial` | 初始化新專案或補齊既有專案缺件 | 只建立缺少的四檔，不覆寫既有內容 |
-| `startup` | 開工與續跑 | 唯讀規則、handoff 與 Git 狀態 |
-| `shutdown` | 收工、版本紀錄與交接 | 更新 `CHANGELOG.md`、`handoff.md`；外部動作另行放行 |
+## 三技能的精確定義
+
+| 技能 | 進入條件 | 核心責任 | 允許寫入 | 硬停止點 |
+|---|---|---|---|---|
+| `initial` | 新專案第一次建立治理結構、既有專案缺件，或明確部署技能 | 建立／驗證四檔與 portable manifest，確認實際 Git root、remote identity 及 bootstrap checkpoint | 建立缺件；`manual` 停在確認點，`standing_scoped` 通過限制後可 commit／push／readback | 初始化報告與 checkpoint 結果完成即停止，不自動開始日常工作 |
+| `startup` | 每次開始或接續一個既有專案 | 唯讀 manifest、`AGENTS.md`、`handoff.md`，fetch 並對照最後 GitHub checkpoint | 不修改專案內容；不建立空 commit | 開工報告完成即停止；dirty／ahead／behind／diverged／wrong remote 各自路由 |
+| `shutdown` | 每次工作階段結束、換電腦或需要留下交接 | 記錄修改與驗證，依 manifest 建立可回滾的 GitHub checkpoint | 每次更新 changelog／handoff；`manual` 等確認，`standing_scoped` 只處理 allowlist | 遠端 SHA 回讀才完成；超出 standing scope 就停止並進 ReadyGate |
+
+標準路由：
+
+```text
+新專案／治理缺件 → initial → 停止
+既有專案每次開始 → startup → 等待工作選擇
+確認工作 → 執行與驗證
+每次工作結束 → shutdown → 本機交接 → manual 確認點／standing_scoped checkpoint
+```
+
+ReadyGate 是按風險插入的橫向閘門，不是 Lite 的第四個固定階段。一般唯讀 `startup` 不啟動 ReadyGate；若工作涉及重大返工、批次、公開發布、刪除、搬移、封存、權限或其他不可逆／外部動作，先走 Requirement Gate，完成後再走 Delivery Gate。
 
 ## 權威與相依關係
 
@@ -36,7 +55,7 @@ cross-device-agent-skills/
 | ReadyGate | [`readygate-skill-chatgpt-app`](https://github.com/sink6985757-web/readygate-skill-chatgpt-app) | commit、push、發布、搬移、封存、權限與其他高風險動作的工作單／閘門 |
 | 專案狀態 | 各專案 repository | 專案自己的四檔與 Git 歷史才是該專案權威 |
 
-Core profile 使用四個技能：Lite 三技能加 `readygate`。Lite profile 本身不強制安裝 ReadyGate，但單獨口令「收工」不授權任何外部 Git、發布、搬移或封存動作。
+Core profile 使用四個技能：Lite 三技能加 `readygate`。Lite profile 本身不強制安裝 ReadyGate；專案 checkpoint 預設為 `manual`。只有專案已經用受治理 `.agents/project-lifecycle.json` 設為 `standing_scoped`，單獨口令「收工」才涵蓋該 manifest 事先授權的窄範圍 commit／push／readback。
 
 Notion、Obsidian、Knowledge Master 與其他外部知識庫皆為 `ON_DEMAND_ONLY`，不屬於 initial／startup／shutdown 流程。
 
@@ -50,6 +69,29 @@ Notion、Obsidian、Knowledge Master 與其他外部知識庫皆為 `ON_DEMAND_O
 | `handoff.md` | 現況、未完成事項、風險與唯一續跑點 | 每次收工，以目前狀態更新 |
 
 `CHANGELOG.md` 是專案內獨立、可版本控制的 Markdown 變更紀錄；不需要 Obsidian 或專門的 RCD 資料夾。
+
+## Part、Project 與 GitHub checkpoint
+
+權威系統採三層模型：
+
+1. **Authority Kernel**：Full Core、Lite、ReadyGate 的共同 schema、版本與規則。
+2. **Part routing → Project instance**：Part 只是分類值；每個實際 repository 是獨立 Project，自己的 Git top-level、remote、branch 與 `.agents/project-lifecycle.json` 才是 Git 邊界。
+3. **Device binding**：裝置絕對路徑、名稱與登入狀態只存在 runtime／ignored `policy.local.yaml`，不得寫入 canonical manifest。
+
+三個流程在 GitHub 的對照意義不同：
+
+| 流程 | GitHub 對照 |
+|---|---|
+| Initial | 對初始化變更建立 bootstrap checkpoint；若無既有 remote 或 push 失敗，標 `PARTIAL`，不自動建立 repository |
+| Startup | fetch 後記錄最後 remote SHA，分類 clean／dirty／ahead／behind／diverged／wrong remote；不建立空 commit |
+| Shutdown | 對本次 allowlist 內成果建立 checkpoint commit，push 目前工作 branch 並回讀 remote SHA |
+
+manifest 有兩種模式：
+
+- `manual`：預設；每次 commit／push 仍需要當次確認。
+- `standing_scoped`：專案事先授權例行 Initial／Shutdown checkpoint，但僅限既有且 identity-matching 的 remote、實際 Git root、目前工作 branch、manifest allowlist、非 force push，且不能有 secret、unknown untracked、divergence 或驗證失敗。
+
+`standing_scoped` 永遠不包含建立 repository、force push、auto merge／rebase、tag／release、PR merge、刪除／封存或權限變更。變更 standing policy 本身也要先走確認工作單／ReadyGate。
 
 ## 人類安裝
 
@@ -99,9 +141,9 @@ done
 收工
 ```
 
-- `初始化專案`：偵測環境、確認 Git 根目錄，並只補齊缺少的四檔。
-- `開工`：唯讀 `AGENTS.md`、`handoff.md` 與 Git 狀態，回報可續跑點。
-- `收工`：更新 `CHANGELOG.md` 與 `handoff.md`；若本次已授權 GitHub delivery，再更新 README 公開文案並通過 Delivery Gate。
+- `初始化專案`：第一次建立治理結構與 manifest；依 checkpoint mode 停在確認點或留下 bootstrap SHA，完成後停止。
+- `開工`：每次工作開始使用；唯讀 fetch／對照最後遠端 SHA，完成後等待下一個工作選擇。
+- `收工`：每次工作結束使用；更新交接並依 checkpoint mode 停在確認點或留下遠端 SHA。`manual` 下單獨說「同步」或「收工」不等於授權 push。
 
 ## 更新與驗證
 
@@ -129,10 +171,11 @@ startup/SKILL.md
 shutdown/SKILL.md
 ```
 
-delivery 前必須更新 README 的安裝／使用／版本／最新變更文案及 CHANGELOG，並經工作單或 ReadyGate 確認後才可 commit、push、tag 或 release。不得 stage 未知 untracked 檔。
+checkpoint 前必須更新 CHANGELOG 與 handoff；只有公開安裝／使用／版本文案改變才更新 README。`manual` 經工作單確認後才可 commit／push；`standing_scoped` 只依 manifest allowlist 執行日常 checkpoint。tag／release 永遠另走 ReadyGate。不得 stage 未知 untracked 檔。
 
 - `v1.x`：歷史 Lite 發行線。
 - `v2.0.0`：單檔技能與專案四檔契約；source 已在 GitHub `main`，尚未建立 tag／Release。
 - 回滾使用可回讀的 Git commit 或 tag；不以 `git reset --hard` 清除未知工作。
+- 已發布錯誤用 `git revert`；查看舊 SHA 用 restore branch。乾淨且只有 behind 時才使用 `pull --ff-only`，diverged 時保存 local／remote refs 並停止；clone 只進空目錄。
 
 歷史變更請見 [`CHANGELOG.md`](CHANGELOG.md)。
