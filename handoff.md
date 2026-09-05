@@ -1,20 +1,19 @@
 # Handoff
 
-## 目前狀態
+## 已完成
 
-- 工作單：`WO-DRIVE-GITHUB-ALIGN-20260905-v2`，使用者已確認依 v2 順序修改與同步既有 GitHub repositories。
-- 本輪：完成initial／startup／shutdown 的 manifest、remote checkpoint 與授權延續契約。既有差異已保全並納入審查。
-- 驗證：initial／startup／shutdown 三份 Skill validator PASS。 `git diff --check` 通過；以本輪提交前重跑結果為準。
-- Git 基底：`383f50275c68bbb54deeaec7d3ffc13384360528`；本文件所在提交承載本輪治理來源更新。
-- Delivery：允許 scoped commit／非 force push 到既有 default branch；遠端回讀前不宣稱已同步。
-- 發行：僅更新 source；既有 tag／Release 保持原狀。
+- `WO-DRIVE-GITHUB-ALIGN-20260905-v2` 已確認；v2 source 契約、manual manifest 與同次授權延續規則已交付既有 GitHub default branch。
+- 三個 authority source SHA 已以 Git／GitHub API 回讀，固定於 `.agents/project-lifecycle.json`；本文件所在 commit 是後續文件 checkpoint，不建立 tag／Release。
+- Core validator 25 files 與 9/9 tests、Lite 三份 Skill validator、ReadyGate Skill／Plugin validator 與 9/9 tests 已通過；manifest 新增後提交前再檢查。
+- newday pilot 已通過 Initial 原四檔不變、Startup 五檔 hash／HEAD 不變、manual scoped commit／push／readback。Drive 原 .archive 保留。
+- dotfiles active source、Drive mirror、runtime 與 canonical 四技能 hash 已一致；kernel PASS（13 skills），4 個 Claude adapter warning 保留為既有獨立缺件。
 
 ## 唯一續跑點
 
-完成本來源 default branch SHA 回讀後，將三個不可變 authority SHA 填入 `newday` 的 manual manifest，驗證 pilot；再同步 dotfiles active source、Drive mirror 與 runtime。
+後續專案直接依自己的 manifest 使用 Startup；只有缺件才 Initial，每次 Shutdown 更新 CHANGELOG／handoff。更新 authority revision 時先檢查來源 commit、相容性與授權範圍，不把來源分支名稱當不可變版本。
 
-## 邊界
+## 維護邊界
 
-各 repository 獨立 checkpoint；不把 Part 當 Git root。不啟用 standing_scoped，不建立 repository、tag／Release，不合併 PR、不搬移或封存。私人設定與來源不明檔案保持原狀。
+Part 只做路由，各 repository 獨立。manual 不等於常設授權；本次已确认工作單範圍繼續有效。未啟用 standing_scoped，不新建 repository、tag／Release，不變更權限、不搬移／封存。Notion／Obsidian／Knowledge Master 不參與日常生命週期。
 
-更新：2026-09-05，Codex。跨裝置接續以實際 Git SHA 與 Drive 回讀為準。
+更新：2026-09-05，Codex。最新 GitHub SHA 以本次 default branch readback 與 Git 歷史核對；Drive 雲端同步須另回讀。

@@ -1,5 +1,17 @@
 # Cross-Device Agent Skills
 
+## 固定來源與專案部署
+
+以下 source checkpoint 已於 2026-09-05 推送並回讀；各專案 manifest 固定到這些包含 v2 契約的 commit。
+
+| 來源 | Repository | Commit |
+|---|---|---|
+| core | `sink6985757-web/cross-device-agent-workflow-core` | `0816aa2d53569d062f6448b874e8ddebf923abb0` |
+| lifecycle | `sink6985757-web/cross-device-agent-skills` | `7a377045b613ed4b9b1e7e5a17c1251dbd213ddf` |
+| readygate | `sink6985757-web/readygate-skill-chatgpt-app` | `b7756661c98b69ca8766bfdfec833eb54ff74b4c` |
+
+`newday` manual pilot 已通過；active chezmoi source、runtime 與 Drive dotfiles mirror 的四技能雜湊一致。Template 已填入可回讀 authority SHA，部署新 Project 時仍須填寫實際 repository identity／routing，不可沿用 example/project。
+
 ## 2026-09-05 維護更新
 
 本次 source 更新包含initial／startup／shutdown 的 manifest、remote checkpoint 與授權延續契約。版本以 Git commit 識別；既有發行 tag 保持不變。當本次對話或已確認工作單已明列更新、commit／push 與驗收範圍，沿用該授權完成，不為相同動作重複提問；未涵蓋的動作仍停在確認點。Startup 維持唯讀，完成讀取報告後可轉入已授權的獨立工作階段。
